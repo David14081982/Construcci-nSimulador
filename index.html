@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BIIN · Demo interactiva</title>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#222B45;--cy:#41D5FB;--bg:#EEF1F7;--mu:#5A6379;--li:#C9D1E0;--pa:#E3E8F2;--gr:#8A93A8;--red:#FB4A46;--n2:#3A4563;--z:1}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:Lexend,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--navy);background:#D5DBE7;-webkit-tap-highlight-color:transparent;overflow:hidden}
+button,input{font-family:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;padding:0}
+a{color:inherit;text-decoration:none}
+h1,h2,p{margin:0}
+:focus-visible{outline:3px solid var(--cy);outline-offset:2px}
+input:focus-visible{outline-offset:-3px}
+#app{height:100%;display:flex;flex-direction:column}
+
+/* barra de demo */
+.bar{flex:none;height:56px;background:var(--navy);color:#fff;display:flex;align-items:center;gap:12px;padding:0 16px;position:relative;z-index:30}
+.bar .logo{display:flex;align-items:center;gap:8px;font-weight:700;letter-spacing:1px;font-size:18px}
+.bar .tag{font-size:12px;font-weight:500;color:var(--li);border:1px solid var(--n2);border-radius:8px;padding:3px 8px;white-space:nowrap}
+.seg{display:flex;background:var(--n2);border-radius:12px;padding:3px;gap:2px;margin:0 auto}
+.seg button{height:34px;padding:0 14px;border-radius:10px;font-size:13px;font-weight:600;color:var(--li);white-space:nowrap}
+.seg button[aria-pressed=true]{background:var(--cy);color:var(--navy)}
+.gear{height:38px;padding:0 12px;border-radius:12px;background:var(--n2);font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.menu{position:absolute;right:12px;top:62px;width:310px;max-width:calc(100vw - 24px);background:#fff;color:var(--navy);border-radius:20px;padding:14px;box-shadow:0 18px 40px rgba(34,43,69,.35);display:flex;flex-direction:column;gap:12px}
+.menu h2{font-size:15px;font-weight:700}
+.menu .opt{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:14px}
+.menu .opt small{display:block;color:var(--mu);font-size:12px;line-height:1.3}
+.sw{flex:none;width:52px;height:30px;border-radius:15px;background:var(--li);position:relative;transition:background .15s}
+.sw::after{content:"";position:absolute;left:3px;top:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .15s}
+.sw[aria-checked=true]{background:var(--navy)}
+.sw[aria-checked=true]::after{transform:translateX(22px)}
+.menu .mb{height:44px;border-radius:14px;background:var(--pa);font-weight:600;font-size:14px}
+
+/* escenario */
+.stage{flex:1;min-height:0;overflow:auto;position:relative}
+.stage.ph{display:flex;align-items:center;justify-content:center;padding:16px}
+.phone{width:390px;height:844px;zoom:var(--z);border-radius:36px;overflow:hidden;position:relative;background:var(--bg);box-shadow:0 30px 70px rgba(34,43,69,.35),0 0 0 8px var(--navy);flex:none}
+.wide{min-height:100%;background:var(--bg)}
+.wide>.in{max-width:1440px;margin:0 auto;padding:20px 32px 40px;display:flex;flex-direction:column;gap:20px}
+@media (max-width:560px){
+  .bar{height:48px;padding:0 8px;gap:6px}
+  .bar .tag,.bar .logo span,.gear span{display:none}
+  .seg button{padding:0 7px;height:32px;font-size:12px}
+  .stage.ph{padding:0;display:block}
+  .phone{width:100%;height:100%;zoom:1;border-radius:0;box-shadow:none}
+  .wide>.in{padding:12px 12px 32px}
+  .menu{top:54px;right:8px}
+}
+
+/* pantallas de celular */
+.scr{display:flex;flex-direction:column;height:100%;background:var(--bg);position:relative;overflow:hidden}
+.main{flex:1;min-height:0;overflow-y:auto;padding:24px 20px 20px;display:flex;flex-direction:column;gap:16px}
+.hd{display:flex;align-items:center;gap:12px}
+.bk{width:48px;height:48px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;flex:none}
+.h1{font-size:26px;font-weight:700;line-height:1.1}
+.sub{font-size:14px;color:var(--mu)}
+.sm{font-size:13px;line-height:1.4;color:var(--mu)}
+.card{background:#fff;border-radius:24px;padding:16px}
+.dark{background:var(--navy);color:#fff;border-radius:24px;padding:18px 20px;box-shadow:0 14px 28px rgba(34,43,69,.25)}
+.dark .k{font-size:14px;color:var(--li)}
+.big{font-size:34px;font-weight:700;line-height:1.1}
+.col{display:flex;flex-direction:column}
+.g2{gap:2px}.g4{gap:4px}.g6{gap:6px}.g8{gap:8px}.g12{gap:12px}.g14{gap:14px}.g16{gap:16px}
+.sb{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.foot{flex:none;background:#fff;border-radius:28px 28px 0 0;padding:14px 20px 18px;box-shadow:0 -6px 24px rgba(34,43,69,.08);display:flex;gap:10px;align-items:center}
+.btn{height:60px;border-radius:20px;font-weight:700;font-size:18px;display:flex;align-items:center;justify-content:center;padding:0 22px;text-align:center}
+.btn.f{flex:1}
+.cy{background:var(--cy);color:var(--navy)}
+.nv{background:var(--navy);color:#fff}
+.pl{background:var(--pa);color:var(--navy)}
+.wh{background:#fff;color:var(--navy)}
+.btn[disabled]{opacity:.45;cursor:default}
+.pill{height:56px;border-radius:18px;font-weight:600;font-size:16px;background:#fff}
+.pill[aria-pressed=true]{background:var(--navy);color:#fff}
+.lbl{font-size:15px;font-weight:600}
+.inp{height:58px;border:0;border-radius:18px;background:#fff;padding:0 16px;font:500 17px Lexend,system-ui,sans-serif;width:100%;min-width:0}
+.inp.bad{box-shadow:inset 0 0 0 2px var(--red)}
+.err{font-size:13px;font-weight:600;color:#B3211E}
+.grid{display:grid;gap:8px}
+.stepper{display:flex;align-items:center;background:#fff;border-radius:18px;height:60px;padding:0 6px}
+.stepper button{width:48px;height:48px;border-radius:14px;font-size:26px;font-weight:600;flex:none}
+.stepper input{flex:1;min-width:0;height:48px;border:0;background:transparent;text-align:center;font:700 24px Lexend,system-ui,sans-serif;-moz-appearance:textfield}
+.stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+input[type=range]{width:100%;height:32px;accent-color:var(--navy);margin:0}
+.chip{background:var(--cy);border-radius:10px;padding:3px 8px;white-space:nowrap}
+.tagp{border-radius:10px;padding:4px 10px;font-size:13px;font-weight:600;white-space:nowrap;display:inline-block}
+.nav{flex:none;display:flex;background:#fff;border-radius:28px 28px 0 0;padding:8px 12px 12px;box-shadow:0 -6px 24px rgba(34,43,69,.06)}
+.nav button{flex:1;min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:12px;font-weight:500;color:var(--mu)}
+.nav button span{display:flex;align-items:center;justify-content:center;width:52px;height:30px;border-radius:15px}
+.nav button[aria-current=page]{font-weight:700;color:var(--navy)}
+.nav button[aria-current=page] span{background:var(--cy)}
+.tile{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:10px;padding:16px;min-height:136px;background:#fff;border-radius:24px}
+.tile b{font-size:18px;font-weight:600}
+.tile i{font-style:normal;font-size:13px;color:var(--mu)}
+.tile.on{background:var(--navy);color:#fff;box-shadow:0 14px 28px rgba(34,43,69,.28)}
+.tile.on i{color:var(--li)}
+.rowl{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:52px;border-bottom:1px solid var(--bg);font-size:16px;width:100%;text-align:left}
+.rowl:last-of-type{border-bottom:0}
+.item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--bg)}
+.item:last-child{border-bottom:0}
+.status{background:var(--pa);border-radius:14px;padding:10px 14px;font-size:14px;font-weight:500}
+.offl{display:flex;gap:12px;align-items:center;background:var(--navy);color:#fff;border-radius:18px;padding:12px 14px;font-size:14px;line-height:1.35}
+@keyframes biinPulse{0%,100%{opacity:1}50%{opacity:.55}}
+.pulse{animation:biinPulse 1.4s ease-in-out infinite}
+@keyframes drop{from{transform:translateY(-120%)}to{transform:none}}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.note{position:absolute;left:10px;right:10px;top:10px;z-index:20;background:#fff;border-radius:20px;padding:12px 14px;box-shadow:0 14px 32px rgba(34,43,69,.3);display:flex;gap:12px;align-items:center;text-align:left;animation:drop .3s ease-out;width:calc(100% - 20px)}
+.note .ic{width:40px;height:40px;border-radius:12px;background:var(--navy);display:flex;align-items:center;justify-content:center;flex:none}
+.note b{font-size:13px;font-weight:600;color:var(--mu);display:block}
+.note span{font-size:15px;font-weight:600;line-height:1.3}
+.toast{position:absolute;left:16px;right:16px;bottom:104px;z-index:20;background:var(--navy);color:#fff;border-radius:16px;padding:12px 16px;font-size:14px;font-weight:500;line-height:1.35;box-shadow:0 10px 24px rgba(34,43,69,.35);animation:fade .2s;text-align:center}
+.wide~.toast,.toast.fx{position:fixed;left:50%;right:auto;bottom:28px;transform:translateX(-50%);max-width:min(480px,calc(100vw - 32px))}
+.veil{position:absolute;inset:0;z-index:15;background:rgba(34,43,69,.45);display:flex;flex-direction:column;justify-content:flex-end;animation:fade .15s}
+.veil.fx{position:fixed;justify-content:center;align-items:center;padding:16px;z-index:40}
+.sheet{background:var(--bg);border-radius:28px 28px 0 0;padding:18px 20px 20px;display:flex;flex-direction:column;gap:14px;max-height:92%;overflow-y:auto;animation:up .22s ease-out}
+.veil.fx .sheet{border-radius:28px;width:440px;max-width:100%;max-height:100%;animation:fade .15s}
+.sheet h2{font-size:22px;font-weight:700;line-height:1.15}
+.radio{display:flex;align-items:center;gap:12px;min-height:56px;border-radius:18px;background:#fff;padding:0 16px;font-size:16px;font-weight:600;text-align:left;width:100%}
+.radio::before{content:"";width:22px;height:22px;border-radius:50%;border:2px solid var(--gr);flex:none}
+.radio[aria-pressed=true]::before{border:7px solid var(--navy)}
+.paper{background:#fff;border-radius:16px;padding:18px 16px;display:flex;flex-direction:column;gap:10px;font-size:13px}
+.paper table{width:100%;border-collapse:collapse}
+.paper th{font-size:11px;font-weight:600;color:var(--mu);text-align:left;padding:6px 4px;border-bottom:2px solid var(--pa)}
+.paper td{padding:7px 4px;border-bottom:1px solid var(--bg);vertical-align:top}
+.paper .r{text-align:right;white-space:nowrap}
+
+/* escritorio y operación */
+.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;background:#fff;border-radius:24px;padding:12px 20px}
+.top .lg{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:700;letter-spacing:1px}
+.lgi{width:40px;height:40px;border-radius:13px;background:var(--navy);display:flex;align-items:center;justify-content:center;flex:none}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tabs button{height:44px;padding:0 20px;border-radius:14px;font-weight:600;font-size:15px}
+.tabs button[aria-selected=true],.tabs button[aria-current=page]{background:var(--navy);color:#fff}
+.panel{background:#fff;border-radius:28px;padding:20px 24px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:16px}
+.kpi{background:#fff;border-radius:24px;padding:20px}
+.kpi .k{font-size:14px;color:var(--mu)}
+.kpi .v{font-size:32px;font-weight:700}
+.kpi.nv{background:var(--navy);color:#fff}
+.kpi.cy{background:var(--cy)}
+.kpi.nv .k{color:var(--li)}
+.kpi.cy .k,.kpi.rd .k{color:var(--navy);font-weight:500}
+.kpi.rd{background:var(--red)}
+.tb{overflow-x:auto}
+.tr{display:grid;gap:12px;align-items:center;padding:12px 0;font-size:15px;border-bottom:1px solid var(--bg)}
+.tr.th{font-size:13px;font-weight:600;color:var(--mu);border-bottom:2px solid var(--pa);padding:10px 0}
+.tr .r{text-align:right}
+.sbtn{height:44px;padding:0 14px;border-radius:14px;background:var(--pa);font-weight:600;font-size:14px;white-space:nowrap;display:inline-flex;align-items:center}
+.sbtn.cy{background:var(--cy)}
+.sbtn.nv{background:var(--navy);color:#fff}
+.dinp{height:56px;border:0;border-radius:16px;background:var(--bg);padding:0 16px;font:700 22px Lexend,system-ui,sans-serif;min-width:0;width:100%}
+.dpill{height:50px;border-radius:16px;font-weight:600;font-size:15px;background:var(--bg)}
+.dpill[aria-pressed=true]{background:var(--navy);color:#fff}
+.ai{height:46px;border:0;border-radius:14px;background:var(--bg);padding:0 12px;font:500 15px Lexend,system-ui,sans-serif;width:100%;min-width:0}
+.fl{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;min-width:0;line-height:1.3}
+.acat{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:16px;text-align:left;flex:1;min-width:0}
+.acat[aria-pressed=true]{background:var(--bg)}
+.ib{width:36px;height:36px;border-radius:10px;background:var(--pa);font-weight:700;flex:none}
+.ib[disabled]{opacity:.35;cursor:default}
+.h3{font-size:18px;font-weight:700}
+.icp{width:56px;height:56px;border-radius:16px;background:var(--bg);display:flex;align-items:center;justify-content:center}
+.icp[aria-pressed=true]{box-shadow:inset 0 0 0 3px var(--navy)}
+.agrid{display:grid;gap:8px;align-items:center}
+.ahd{font-size:12px;font-weight:600;color:var(--mu)}
+.types{display:flex;flex-wrap:wrap;gap:6px}
+.types button{height:40px;padding:0 14px;border-radius:12px;background:var(--bg);font-size:14px;font-weight:600}
+.types button[aria-pressed=true]{background:var(--cy)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="vendor/supabase.js"></script>
+<script>
+'use strict';
+/* ============ conexión a Supabase ============
+   La clave publicable es pública por diseño: la seguridad está en las políticas RLS (supabase/schema.sql).
+   Deja url y key vacías para usar la demo sin base de datos. */
+const SUPA = { url: 'https://dwtczkkkeyoorapedctq.supabase.co', key: 'sb_publishable_5gPoa73Y8eXRU_HWXlZp-Q_CVieGHmq' };
+let sb = null, conn = 'demo';
+if (SUPA.url && SUPA.key) {
+  if (window.supabase && window.supabase.createClient) { try { sb = window.supabase.createClient(SUPA.url, SUPA.key); conn = 'on'; } catch (e) { conn = 'error'; } }
+  else conn = 'error';
+}
+const uuid = () => (window.crypto && crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3 | 8)).toString(16); }));
+/* ============ utilidades ============ */
+const money = (n) => n.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' });
+const num = (n) => n.toLocaleString('es-MX');
+const fmt = (n) => String(Math.round(n * 100) / 100);
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const r2 = (n) => Math.round(n * 100) / 100;
+const DD = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+const MM = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+const T0 = new Date(); T0.setHours(12, 0, 0, 0);
+const addD = (n) => { const d = new Date(T0); d.setDate(d.getDate() + n); return d; };
+const dLong = (d) => DD[d.getDay()] + ' ' + d.getDate() + ' de ' + MM[d.getMonth()];
+const dShort = (d) => d.getDate() + ' de ' + MM[d.getMonth()];
+const dOps = (d) => d.getDate() + ' ' + MM[d.getMonth()];
+const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+const dayDiff = (d) => Math.round((d - T0) / 864e5);
+
+/* ============ catálogo (costo preferente con proveedor) ============ */
+const CAT0 = {
+  block12: { n: 'Block de concreto 12×20×40', s: 'block', u: 'pz', c: 11.16 },
+  block15: { n: 'Block de concreto 15×20×40', s: 'block', u: 'pz', c: 12.95 },
+  block20: { n: 'Block de concreto 20×20×40', s: 'block', u: 'pz', c: 16.875 },
+  ladrillo: { n: 'Ladrillo rojo 6×12×24', s: 'ladrillo', u: 'pz', c: 4.82 },
+  tabique: { n: 'Tabique rojo 7×14×28', s: 'tabique', u: 'pz', c: 6.43 },
+  cemento: { n: 'Cemento gris 50 kg', s: 'cemento', u: 'bultos', c: 218.75 },
+  arena: { n: 'Arena', s: 'arena', u: 'm³', c: 375 },
+  grava: { n: 'Grava', s: 'grava', u: 'm³', c: 410.71 },
+  varilla: { n: 'Varilla 3/8" de 12 m', s: 'varilla', u: 'pz', c: 165.18 },
+  alambron: { n: 'Alambrón 1/4"', s: 'alambrón', u: 'kg', c: 25 },
+  recocido: { n: 'Alambre recocido', s: 'alambre', u: 'kg', c: 33.93 },
+  malla: { n: 'Malla electrosoldada 6×6-10/10 (hoja 2.5×6 m)', s: 'malla', u: 'hojas', c: 1026.79 },
+  azulejo: { n: 'Azulejo (caja de 1.5 m²)', s: 'azulejo', u: 'cajas', c: 254.46 },
+  pega: { n: 'Pegazulejo 20 kg', s: 'pegazulejo', u: 'bultos', c: 120.54 },
+  boquilla: { n: 'Boquilla 5 kg', s: 'boquilla', u: 'bolsas', c: 84.82 },
+  crucetas: { n: 'Crucetas (bolsa de 100)', s: 'crucetas', u: 'bolsas', c: 31.25 },
+  pint19: { n: 'Pintura vinílica 19 L', s: 'pintura', u: 'cubetas', c: 1687.5 },
+  pint4: { n: 'Pintura vinílica 4 L', s: 'pintura', u: 'galones', c: 400.89 },
+  sellador: { n: 'Sellador 5×1 de 4 L', s: 'sellador', u: 'pz', c: 293.75 },
+  kit: { n: 'Rodillo, brocha y charola', s: 'rodillo', u: 'kit', c: 168.75 }
+};
+const price = (k) => r2(CAT[k].c * (1 + CFG.margen / 100));
+
+const MAT = {
+  block: { l: 'Block', ppm: 12.5, mm: 0.02, uw: 0.4, uh: 0.2 },
+  ladrillo: { l: 'Ladrillo', ppm: 52, mm: 0.035, uw: 0.5, uh: 0.15 },
+  tabique: { l: 'Tabique', ppm: 40, mm: 0.03, uw: 0.6, uh: 0.17 }
+};
+const O_MAT = ['mat', 'Material', [['block', 'Block'], ['ladrillo', 'Ladrillo'], ['tabique', 'Tabique']], 'block'];
+const O_ESP = ['e', 'Espesor del muro', [['12', '12 cm'], ['15', '15 cm'], ['20', '20 cm']], '15'];
+/* f: [clave, etiqueta, mín, máx, paso, inicial] · o: [clave, etiqueta, opciones, inicial] */
+const TYPES0 = {
+  barda: { t: 'Barda', d: 'Block, ladrillo o tabique', f: [['L', 'Largo (m)', 1, 60, 0.5, 10], ['H', 'Alto (m)', 0.5, 4, 0.5, 2.5]], o: [O_MAT, O_ESP], w: 5, note: 'No incluye cimentación ni mano de obra.' },
+  muro: { t: 'Muro', d: 'Interior o de carga', f: [['L', 'Largo (m)', 1, 60, 0.5, 5], ['H', 'Alto (m)', 0.5, 4, 0.5, 2.5]], o: [O_MAT, O_ESP], w: 5, note: 'No incluye cimentación ni mano de obra.' },
+  losa: { t: 'Losa', d: 'Techo o entrepiso', f: [['L', 'Largo (m)', 1, 20, 0.5, 8], ['A', 'Ancho (m)', 1, 12, 0.5, 4]], o: [['e', 'Espesor de la losa', [['10', '10 cm'], ['12', '12 cm'], ['15', '15 cm']], '10']], w: 5, note: 'Losa maciza. No incluye cimbra ni mano de obra.' },
+  firme: { t: 'Firme o piso', d: 'Concreto para piso', f: [['L', 'Largo (m)', 1, 30, 0.5, 6], ['A', 'Ancho (m)', 1, 20, 0.5, 4]], o: [['e', 'Espesor del firme', [['8', '8 cm'], ['10', '10 cm'], ['12', '12 cm']], '8']], w: 5, note: 'No incluye compactación ni mano de obra.' },
+  cimentacion: { t: 'Cimentación', d: 'Zapatas y cadenas', f: [['L', 'Largo total (m)', 1, 80, 1, 20]], o: [['a', 'Ancho de la zapata', [['40', '40 cm'], ['60', '60 cm'], ['80', '80 cm']], '60']], w: 5, note: 'Zapata corrida con cadena. No incluye excavación ni mano de obra.' },
+  castillos: { t: 'Castillos y dalas', d: 'Refuerzos de concreto', f: [['L', 'Metros en total', 1, 200, 1, 30]], o: [['s', 'Sección', [['15x15', '15×15'], ['15x20', '15×20'], ['20x20', '20×20']], '15x20']], w: 5, note: 'Incluye traslapes. No incluye cimbra ni mano de obra.' },
+  aplanado: { t: 'Aplanado', d: 'Mezcla sobre muro', f: [['L', 'Largo (m)', 1, 60, 0.5, 10], ['H', 'Alto (m)', 0.5, 6, 0.5, 2.5]], o: [['e', 'Espesor', [['1.5', '1.5 cm'], ['2', '2 cm'], ['2.5', '2.5 cm']], '2'], ['c', 'Caras del muro', [['1', 'Una cara'], ['2', 'Dos caras']], '1']], w: 5, note: 'Mezcla de cemento y arena. No incluye mano de obra.' },
+  azulejo: { t: 'Azulejo', d: 'Pegado en piso o pared', f: [['L', 'Largo (m)', 0.5, 30, 0.5, 4], ['A', 'Ancho (m)', 0.5, 20, 0.5, 3]], o: [['f', 'Tamaño de la pieza', [['30', '30×30'], ['45', '45×45'], ['60', '60×60']], '45']], w: 10, note: 'En azulejo lo normal es 10% por cortes. No incluye mano de obra.' },
+  pintura: { t: 'Pintura', d: 'Litros por superficie', f: [['L', 'Largo (m)', 1, 80, 0.5, 12], ['H', 'Alto (m)', 1, 6, 0.5, 2.5]], o: [['m', 'Manos de pintura', [['1', '1 mano'], ['2', '2 manos'], ['3', '3 manos']], '2']], w: 5, note: 'Rinde unos 10 m² por litro en cada mano. No incluye mano de obra.' },
+  cuarto: { t: 'Cuarto completo', d: 'Todo en un solo cálculo', f: [['L', 'Largo (m)', 2, 12, 0.5, 4], ['A', 'Ancho (m)', 2, 12, 0.5, 3], ['H', 'Alto (m)', 2.2, 3.5, 0.1, 2.5]], o: [O_MAT], w: 5, note: 'Muros de 15 cm, losa de 10 cm y firme de 8 cm. Sin descontar puerta ni ventanas.' }
+};
+const ORDER0 = ['barda', 'muro', 'losa', 'firme', 'cimentacion', 'castillos', 'aplanado', 'azulejo', 'pintura', 'cuarto'];
+/* ---- Bases del cálculo: [etiqueta, valor de fábrica, unidad] ---- */
+const PAR0 = {
+  pz_block: ['Block por m² de muro', 12.5, 'pz/m²'], pz_ladrillo: ['Ladrillo por m² de muro', 52, 'pz/m²'], pz_tabique: ['Tabique por m² de muro', 40, 'pz/m²'],
+  mm_block: ['Mezcla para pegar block', 0.02, 'm³/m²'], mm_ladrillo: ['Mezcla para pegar ladrillo', 0.035, 'm³/m²'], mm_tabique: ['Mezcla para pegar tabique', 0.03, 'm³/m²'],
+  mor_cem: ['Cemento por m³ de mezcla', 8.5, 'bultos'], mor_are: ['Arena por m³ de mezcla', 1.1, 'm³'],
+  conc_cem: ['Cemento por m³ de concreto', 7, 'bultos'], conc_are: ['Arena por m³ de concreto', 0.55, 'm³'], conc_gra: ['Grava por m³ de concreto', 0.7, 'm³'],
+  firme_cem: ['Cemento por m³ de concreto de firme', 6, 'bultos'], firme_are: ['Arena por m³ de concreto de firme', 0.56, 'm³'], firme_gra: ['Grava por m³ de concreto de firme', 0.72, 'm³'],
+  cast_sep: ['Separación entre castillos', 3, 'm'], cast_lado: ['Lado del castillo (el otro es el espesor del muro)', 0.15, 'm'], dala_alto: ['Peralte de la dala', 0.2, 'm'],
+  cast_var: ['Varillas por castillo, dala o cadena', 4, 'pz'], cast_ancla: ['Anclaje de varilla por castillo', 0.5, 'm'], var_largo: ['Largo de una varilla', 12, 'm'],
+  est_sep: ['Separación entre estribos', 0.2, 'm'], est_largo: ['Alambrón por estribo', 0.6, 'm'], alam_kgm: ['Peso del alambrón', 0.25, 'kg/m'], rec_kgvar: ['Alambre recocido por varilla', 0.25, 'kg'],
+  losa_sep: ['Separación de la parrilla de losa', 0.2, 'm'],
+  malla_m2: ['Superficie que cubre una hoja de malla', 15, 'm²'], firme_rec: ['Alambre recocido por m² de firme', 0.03, 'kg'],
+  zap_alto: ['Peralte de la zapata', 0.2, 'm'], zap_sep: ['Separación de varillas en la zapata', 0.2, 'm'], cad_ancho: ['Ancho de la cadena', 0.15, 'm'], cad_alto: ['Peralte de la cadena', 0.2, 'm'],
+  cyd_traslape: ['Traslape de varilla', 10, '%'],
+  az_caja: ['Superficie por caja de azulejo', 1.5, 'm²'], az_pega: ['Superficie por bulto de pegazulejo', 4, 'm²'], az_pega60: ['Superficie por bulto de pegazulejo en pieza de 60×60', 3, 'm²'], az_boq: ['Superficie por bolsa de boquilla', 15, 'm²'], az_cruz: ['Superficie por bolsa de crucetas', 10, 'm²'],
+  pin_m2l: ['Superficie que cubre un litro por mano', 10, 'm²'], pin_sell: ['Superficie por sellador de 4 L', 100, 'm²'],
+  cu_losa: ['Espesor de la losa del cuarto', 10, 'cm'], cu_firme: ['Espesor del firme del cuarto', 8, 'cm']
+};
+const P_MURO = ['pz_block', 'pz_ladrillo', 'pz_tabique', 'mm_block', 'mm_ladrillo', 'mm_tabique', 'mor_cem', 'mor_are', 'cast_sep', 'cast_lado', 'dala_alto', 'cast_var', 'cast_ancla', 'var_largo', 'est_sep', 'est_largo', 'alam_kgm', 'rec_kgvar', 'conc_cem', 'conc_are', 'conc_gra'];
+const cm = (m) => fmt(m * 100) + ' cm';
+const L_MURO = (K) => [
+  ['Piezas', 'área del muro × piezas por m² del material elegido (block ' + K.pz_block + ', ladrillo ' + K.pz_ladrillo + ', tabique ' + K.pz_tabique + ').'],
+  ['Mezcla', 'área × m³ de mezcla por m² según el material.'],
+  ['Castillos y dala', 'un castillo cada ' + K.cast_sep + ' m más uno al final, de espesor del muro × ' + cm(K.cast_lado) + '; y una dala de espesor × ' + cm(K.dala_alto) + ' en todo el largo.'],
+  ['Cemento', 'm³ de mezcla × ' + K.mor_cem + ' + m³ de concreto × ' + K.conc_cem + ' bultos.'],
+  ['Arena', 'm³ de mezcla × ' + K.mor_are + ' + m³ de concreto × ' + K.conc_are + ' m³.'],
+  ['Grava', 'm³ de concreto × ' + K.conc_gra + ' m³.'],
+  ['Varilla', K.cast_var + ' por castillo (alto + ' + K.cast_ancla + ' m de anclaje) y ' + K.cast_var + ' a lo largo de la dala, en tramos de ' + K.var_largo + ' m.'],
+  ['Alambrón', 'un estribo de ' + K.est_largo + ' m cada ' + cm(K.est_sep) + ' en castillos y dala, a ' + K.alam_kgm + ' kg por metro.'],
+  ['Alambre recocido', K.rec_kgvar + ' kg por cada varilla.']
+];
+const L_LOSA = (K, e) => [
+  ['Concreto', 'largo × ancho × espesor' + (e ? ' (' + e + ' cm)' : '') + '.'],
+  ['Cemento, arena y grava', K.conc_cem + ' bultos, ' + K.conc_are + ' m³ y ' + K.conc_gra + ' m³ por cada m³ de concreto.'],
+  ['Varilla', 'parrilla en los dos sentidos a cada ' + cm(K.losa_sep) + ', en tramos de ' + K.var_largo + ' m.'],
+  ['Alambre recocido', K.rec_kgvar + ' kg por cada varilla.']
+];
+const L_FIRME = (K, e) => [
+  ['Concreto', 'largo × ancho × espesor' + (e ? ' (' + e + ' cm)' : '') + '.'],
+  ['Cemento, arena y grava', K.firme_cem + ' bultos, ' + K.firme_are + ' m³ y ' + K.firme_gra + ' m³ por cada m³ de concreto.'],
+  ['Malla electrosoldada', 'una hoja por cada ' + K.malla_m2 + ' m².'],
+  ['Alambre recocido', K.firme_rec + ' kg por m².']
+];
+/* Qué valores usa cada fórmula y cómo se explica en el panel */
+const BASES = {
+  barda: { pars: P_MURO, lines: L_MURO },
+  muro: { pars: P_MURO, lines: L_MURO },
+  losa: { pars: ['conc_cem', 'conc_are', 'conc_gra', 'losa_sep', 'var_largo', 'rec_kgvar'], lines: (K) => L_LOSA(K) },
+  firme: { pars: ['firme_cem', 'firme_are', 'firme_gra', 'malla_m2', 'firme_rec'], lines: (K) => L_FIRME(K) },
+  cimentacion: { pars: ['zap_alto', 'zap_sep', 'cad_ancho', 'cad_alto', 'cast_var', 'var_largo', 'est_sep', 'est_largo', 'alam_kgm', 'rec_kgvar', 'conc_cem', 'conc_are', 'conc_gra'], lines: (K) => [
+    ['Concreto', 'largo × (ancho de zapata × ' + cm(K.zap_alto) + ' + cadena de ' + cm(K.cad_ancho) + ' × ' + cm(K.cad_alto) + ').'],
+    ['Cemento, arena y grava', K.conc_cem + ' bultos, ' + K.conc_are + ' m³ y ' + K.conc_gra + ' m³ por cada m³ de concreto.'],
+    ['Varilla', K.cast_var + ' en la cadena, más la parrilla de la zapata a cada ' + cm(K.zap_sep) + ' en los dos sentidos, en tramos de ' + K.var_largo + ' m.'],
+    ['Alambrón', 'un estribo de ' + K.est_largo + ' m cada ' + cm(K.est_sep) + ', a ' + K.alam_kgm + ' kg por metro.'],
+    ['Alambre recocido', K.rec_kgvar + ' kg por cada varilla.']] },
+  castillos: { pars: ['cast_var', 'cyd_traslape', 'var_largo', 'est_sep', 'alam_kgm', 'rec_kgvar', 'conc_cem', 'conc_are', 'conc_gra'], lines: (K) => [
+    ['Concreto', 'metros lineales × sección elegida.'],
+    ['Cemento, arena y grava', K.conc_cem + ' bultos, ' + K.conc_are + ' m³ y ' + K.conc_gra + ' m³ por cada m³ de concreto.'],
+    ['Varilla', K.cast_var + ' por tramo más ' + K.cyd_traslape + '% de traslape, en tramos de ' + K.var_largo + ' m.'],
+    ['Alambrón', 'un estribo cada ' + cm(K.est_sep) + '; su largo es el perímetro de la sección menos 8 cm; a ' + K.alam_kgm + ' kg por metro.'],
+    ['Alambre recocido', K.rec_kgvar + ' kg por cada varilla.']] },
+  aplanado: { pars: ['mor_cem', 'mor_are'], lines: (K) => [
+    ['Mezcla', 'largo × alto × caras × espesor.'],
+    ['Cemento', 'm³ de mezcla × ' + K.mor_cem + ' bultos.'],
+    ['Arena', 'm³ de mezcla × ' + K.mor_are + ' m³.']] },
+  azulejo: { pars: ['az_caja', 'az_pega', 'az_pega60', 'az_boq', 'az_cruz'], lines: (K) => [
+    ['Azulejo', 'área ÷ ' + K.az_caja + ' m² por caja.'],
+    ['Pegazulejo', 'un bulto por cada ' + K.az_pega + ' m² (' + K.az_pega60 + ' m² en pieza de 60×60).'],
+    ['Boquilla', 'una bolsa por cada ' + K.az_boq + ' m².'],
+    ['Crucetas', 'una bolsa por cada ' + K.az_cruz + ' m².']] },
+  pintura: { pars: ['pin_m2l', 'pin_sell'], lines: (K) => [
+    ['Litros', 'área × manos ÷ ' + K.pin_m2l + ' m² por litro, más el desperdicio.'],
+    ['Cubetas y galones', 'los litros se reparten en cubetas de 19 L y galones de 4 L.'],
+    ['Sellador', 'uno de 4 L por cada ' + K.pin_sell + ' m².'],
+    ['Rodillo, brocha y charola', 'un kit por cálculo.']] },
+  cuarto: { pars: ['cu_losa', 'cu_firme'].concat(P_MURO, ['losa_sep', 'firme_cem', 'firme_are', 'firme_gra', 'malla_m2', 'firme_rec']), lines: (K) => [
+    ['Muros', 'se calculan como una barda con largo igual al perímetro (2 × largo + 2 × ancho), en muro de 15 cm, con un castillo cada ' + K.cast_sep + ' m.']]
+    .concat(L_MURO(K).slice(0, 2), L_LOSA(K, K.cu_losa).map((x) => ['Losa · ' + x[0], x[1]]), L_FIRME(K, K.cu_firme).map((x) => ['Firme · ' + x[0], x[1]]), [['Suma', 'cemento, arena, grava, varilla y alambre de muros, losa y firme se suman en una sola lista.']]) }
+};
+const parShared = (k) => Object.keys(BASES).filter((b) => b !== 'muro' && BASES[b].pars.indexOf(k) >= 0).length > 1;
+
+/* ---- Configuración editable desde el panel de Super administrador ----
+   CAT = materiales, TYPES = categorías, ORDER = orden en pantalla, CFG = ajustes y bases del cálculo.
+   DB es la única capa de datos: hoy guarda en este navegador; al conectar Supabase
+   se reemplazan load() y save() por lecturas y escrituras a las tablas (ver supabase/schema.sql). */
+let CAT, TYPES, ORDER, CFG;
+const parDefaults = () => { const o = {}; Object.keys(PAR0).forEach((k) => { o[k] = PAR0[k][1]; }); return o; };
+function factory() {
+  CAT = JSON.parse(JSON.stringify(CAT0));
+  TYPES = JSON.parse(JSON.stringify(TYPES0));
+  Object.keys(TYPES).forEach((k) => Object.assign(TYPES[k], { base: k, icon: k, on: true, h: 'Pon las medidas y listo', off: {}, extra: [] }));
+  ORDER = ORDER0.slice();
+  CFG = { margen: 12, tasa: 3, linea: 50000, par: parDefaults() };
+}
+const applyCfg = (d) => {
+  if (!(d && d.TYPES && d.CAT && d.ORDER && d.CFG)) return false;
+  CAT = d.CAT; TYPES = d.TYPES; ORDER = d.ORDER; CFG = d.CFG; CFG.par = Object.assign(parDefaults(), d.CFG.par || {});
+  return true;
+};
+const DB = {
+  key: 'biin_config_v1', timer: 0,
+  /* sin Supabase: el catálogo vive en este navegador */
+  load() { if (sb) return false; try { return applyCfg(JSON.parse(localStorage.getItem(this.key))); } catch (e) { /* sin almacenamiento */ } return false; },
+  /* con Supabase: tabla configuracion (una fila); solo escribe el super administrador */
+  async pull() { const r = await sb.from('configuracion').select('datos').eq('id', 1).maybeSingle(); if (r.error) throw r.error; return applyCfg(r.data && r.data.datos); },
+  save() {
+    if (!sb) { try { localStorage.setItem(this.key, JSON.stringify({ CAT: CAT, TYPES: TYPES, ORDER: ORDER, CFG: CFG })); } catch (e) { /* sin almacenamiento */ } return; }
+    if (!S.user || S.user.rol !== 'super_admin') return;
+    clearTimeout(this.timer);
+    this.timer = setTimeout(() => {
+      sb.from('configuracion').upsert({ id: 1, datos: JSON.parse(JSON.stringify({ CAT: CAT, TYPES: TYPES, ORDER: ORDER, CFG: CFG })), updated_at: new Date().toISOString() })
+        .then((r) => { if (r.error) { toast('No se pudo guardar en Supabase: ' + r.error.message); render(); } });
+    }, 700);
+  },
+  clear() { if (sb) return; try { localStorage.removeItem(this.key); } catch (e) { /* sin almacenamiento */ } }
+};
+factory(); DB.load();
+const defaults = (type) => { const T = TYPES[type], p = { w: T.w }; T.f.forEach((f) => { p[f[0]] = Math.min(f[3], Math.max(f[2], f[5])); }); T.o.forEach((o) => { p[o[0]] = o[3]; }); return p; };
+const fam = (k) => (/^block\d+$|^ladrillo$|^tabique$/.test(k) ? 'pieza' : /^pint/.test(k) ? 'pintura' : k);
+const FAMN = { pieza: 'Pieza del muro (block, ladrillo o tabique)', pintura: 'Pintura vinílica (cubetas y galones)' };
+const PERS = [['area', 'por m²'], ['largo', 'por metro lineal'], ['fijo', 'por cálculo (fijo)']];
+const UNITS = ['pz', 'bultos', 'm³', 'kg', 'hojas', 'cajas', 'bolsas', 'cubetas', 'galones', 'kit', 'litros', 'm', 'm²', 'rollos'];
+
+/* ============ cálculo ============ */
+/* Las bases del cálculo viven en CFG.par y se editan desde el panel de Super administrador. */
+function wallRaw(L, H, mat, e, nC) {
+  const K = CFG.par, E = e / 100, area = L * H, mort = area * K['mm_' + mat], conc = nC * E * K.cast_lado * H + L * E * K.dala_alto;
+  return [
+    [mat === 'block' ? 'block' + e : mat, area * K['pz_' + mat], 'Muro'],
+    ['cemento', mort * K.mor_cem + conc * K.conc_cem, 'Mezcla y concreto'],
+    ['arena', mort * K.mor_are + conc * K.conc_are, 'Mezcla y concreto'],
+    ['grava', conc * K.conc_gra, 'Castillos y dala'],
+    ['varilla', (nC * K.cast_var * (H + K.cast_ancla) + L * K.cast_var) / K.var_largo, 'Castillos y dala'],
+    ['alambron', (nC * H + L) / K.est_sep * K.est_largo * K.alam_kgm, 'Estribos'],
+    ['recocido', 'auto', 'Amarres']
+  ];
+}
+function losaRaw(L, A, e) {
+  const K = CFG.par, vol = L * A * e, varM = (Math.ceil(L / K.losa_sep) + 1) * A + (Math.ceil(A / K.losa_sep) + 1) * L;
+  return [['cemento', vol * K.conc_cem, 'Concreto'], ['arena', vol * K.conc_are, 'Concreto'], ['grava', vol * K.conc_gra, 'Concreto'], ['varilla', varM / K.var_largo, 'Parrilla a cada ' + fmt(K.losa_sep * 100) + ' cm'], ['recocido', 'auto', 'Amarres']];
+}
+function firmeRaw(L, A, e) {
+  const K = CFG.par, vol = L * A * e;
+  return [['cemento', vol * K.firme_cem, 'Concreto'], ['arena', vol * K.firme_are, 'Concreto'], ['grava', vol * K.firme_gra, 'Concreto'], ['malla', L * A / K.malla_m2, 'Refuerzo'], ['recocido', L * A * K.firme_rec, 'Amarres']];
+}
+function finalize(raw, w, names) {
+  const map = new Map();
+  raw.forEach((r) => {
+    let x = map.get(r[0]);
+    if (!x) { x = { key: r[0], q: 0, auto: false, uses: [], exact: !!r[3] }; map.set(r[0], x); }
+    if (r[1] === 'auto') x.auto = true; else x.q += r[1];
+    if (x.uses.indexOf(r[2]) < 0) x.uses.push(r[2]);
+  });
+  const out = [];
+  let vars = 0;
+  map.forEach((x) => {
+    const c = CAT[x.key];
+    if (!c) return;
+    let q = x.exact ? x.q : x.q * (1 + w);
+    q = c.u === 'm³' ? Math.ceil(q * 2 - 1e-9) / 2 : Math.ceil(q - 1e-9);
+    if (x.key === 'varilla') vars = q;
+    if (x.key === 'recocido' && x.auto) q += Math.ceil(vars * CFG.par.rec_kgvar - 1e-9);
+    if (!(q > 0)) return;
+    const p = price(x.key);
+    out.push({ key: x.key, n: (names && names[x.key]) || c.n, use: x.uses.length > 1 ? 'Toda la obra' : x.uses[0], qty: q, u: c.u, price: p, cost: r2(q * p) });
+  });
+  return out;
+}
+function calc(type, p) {
+  const T = TYPES[type], base = T.base, K = CFG.par, w = p.w / 100, L = p.L, H = p.H, A = p.A;
+  let raw = [], r = {}, names = null;
+  if (base === 'barda' || base === 'muro') {
+    const nC = Math.ceil(L / K.cast_sep - 1e-9) + 1;
+    raw = wallRaw(L, H, p.mat, +p.e, nC);
+    r = { area: L * H, largo: L, eq: [fmt(L) + ' m de largo', fmt(H) + ' m de alto'], dims: fmt(L) + ' m × ' + fmt(H) + ' m', sub: MAT[p.mat].l + ' de ' + p.e + ' cm', extra: nC + ' castillos · 1 dala de cerramiento', draw: (W, h, b) => drawWall(W, h, b, L, H, MAT[p.mat], nC, 0) };
+  } else if (base === 'losa') {
+    raw = losaRaw(L, A, +p.e / 100);
+    r = { area: L * A, eq: [fmt(L) + ' m de largo', fmt(A) + ' m de ancho'], dims: fmt(L) + ' m × ' + fmt(A) + ' m', sub: 'Maciza de ' + p.e + ' cm', extra: fmt(L * A * p.e / 100) + ' m³ de concreto', lead: fmt(L * A * p.e / 100) + ' m³ de concreto', draw: (W, h, b) => drawPlan(W, h, b, L, A, 0.2, 'rebar') };
+  } else if (base === 'firme') {
+    raw = firmeRaw(L, A, +p.e / 100);
+    r = { area: L * A, eq: [fmt(L) + ' m de largo', fmt(A) + ' m de ancho'], dims: fmt(L) + ' m × ' + fmt(A) + ' m', sub: 'Firme de ' + p.e + ' cm', extra: fmt(L * A * p.e / 100) + ' m³ de concreto', lead: fmt(L * A * p.e / 100) + ' m³ de concreto', draw: (W, h, b) => drawPlan(W, h, b, L, A, 0.15, 'mesh') };
+  } else if (base === 'cimentacion') {
+    const a = +p.a / 100, vol = L * (a * K.zap_alto + K.cad_ancho * K.cad_alto);
+    raw = [['cemento', vol * K.conc_cem, 'Zapata y cadena'], ['arena', vol * K.conc_are, 'Zapata y cadena'], ['grava', vol * K.conc_gra, 'Zapata y cadena'], ['varilla', ((K.cast_var + Math.ceil(a / K.zap_sep - 1e-9) + 1) * L + (L / K.zap_sep) * a) / K.var_largo, 'Zapata y cadena'], ['alambron', L / K.est_sep * K.est_largo * K.alam_kgm, 'Estribos'], ['recocido', 'auto', 'Amarres']];
+    r = { chip: fmt(L) + ' m', largo: L, eq: [fmt(L) + ' m lineales', 'zapata de ' + p.a + ' cm'], dims: fmt(L) + ' m', sub: 'Zapata corrida de ' + p.a + ' cm', extra: fmt(vol) + ' m³ de concreto', lead: fmt(vol) + ' m³ de concreto', draw: (W, h, b) => drawStrip(W, h, b, L, 80, true) };
+  } else if (base === 'castillos') {
+    const s = p.s.split('x'), a = s[0] / 100, bb = s[1] / 100, vol = L * a * bb;
+    raw = [['cemento', vol * K.conc_cem, 'Concreto'], ['arena', vol * K.conc_are, 'Concreto'], ['grava', vol * K.conc_gra, 'Concreto'], ['varilla', K.cast_var * L * (1 + K.cyd_traslape / 100) / K.var_largo, K.cast_var + ' varillas por tramo'], ['alambron', L / K.est_sep * (2 * (a + bb) - 0.08) * K.alam_kgm, 'Estribos a cada ' + fmt(K.est_sep * 100) + ' cm'], ['recocido', 'auto', 'Amarres']];
+    r = { chip: fmt(L) + ' m', largo: L, eq: [fmt(L) + ' m lineales', 'sección ' + s[0] + '×' + s[1]], dims: fmt(L) + ' m', sub: 'Sección de ' + s[0] + '×' + s[1] + ' cm', extra: fmt(vol) + ' m³ de concreto', lead: fmt(vol) + ' m³ de concreto', draw: (W, h, b) => drawStrip(W, h, b, L, 200, false) };
+  } else if (base === 'aplanado') {
+    const c = +p.c, vol = L * H * c * (+p.e / 100);
+    raw = [['cemento', vol * K.mor_cem, 'Mezcla'], ['arena', vol * K.mor_are, 'Mezcla']];
+    r = { area: L * H * c, largo: L, eq: [fmt(L) + ' m de largo', fmt(H) + ' m de alto'].concat(c === 2 ? ['2 caras'] : []), dims: fmt(L) + ' m × ' + fmt(H) + ' m', sub: p.e + ' cm, ' + (c === 1 ? 'una cara' : 'dos caras'), extra: fmt(vol) + ' m³ de mezcla', lead: fmt(vol) + ' m³ de mezcla', draw: (W, h, b) => drawWall(W, h, b, L, H, MAT.block, 0, 1) };
+  } else if (base === 'azulejo') {
+    const f = +p.f, area = L * A, pz = Math.ceil(area * (1 + w) / (f * f / 1e4));
+    raw = [['azulejo', area / K.az_caja, 'Piso o pared'], ['pega', area / (f >= 60 ? K.az_pega60 : K.az_pega), 'Pegado'], ['boquilla', area / K.az_boq, 'Juntas'], ['crucetas', area / K.az_cruz, 'Separadores']];
+    names = { azulejo: 'Azulejo ' + f + '×' + f + ' (caja de ' + fmt(K.az_caja) + ' m²)' };
+    r = { area: area, eq: [fmt(L) + ' m de largo', fmt(A) + ' m de ancho'], dims: fmt(L) + ' m × ' + fmt(A) + ' m', sub: 'Pieza de ' + f + '×' + f + ' cm', extra: 'Unas ' + num(pz) + ' piezas', lead: num(pz) + ' piezas', draw: (W, h, b) => drawPlan(W, h, b, L, A, f / 100, 'tile') };
+  } else if (base === 'pintura') {
+    const area = L * H, lit = Math.ceil(area * (+p.m) / K.pin_m2l * (1 + w) - 1e-9);
+    let c = Math.floor(lit / 19), g = Math.ceil((lit - c * 19) / 4);
+    if (g > 4) { c++; g = 0; }
+    if (c) raw.push(['pint19', c, 'Pintura', 1]);
+    if (g) raw.push(['pint4', g, 'Pintura', 1]);
+    raw.push(['sellador', Math.ceil(area / K.pin_sell - 1e-9), 'Antes de pintar', 1], ['kit', 1, 'Para aplicar', 1]);
+    r = { area: area, largo: L, eq: [fmt(L) + ' m de largo', fmt(H) + ' m de alto'], dims: fmt(L) + ' m × ' + fmt(H) + ' m', sub: p.m + (p.m === '1' ? ' mano' : ' manos'), extra: lit + ' litros de pintura', lead: lit + ' litros', draw: (W, h, b) => drawWall(W, h, b, L, H, null, 0, 1) };
+  } else if (base === 'cuarto') {
+    const P = 2 * (L + A), nC = Math.ceil(P / K.cast_sep - 1e-9);
+    raw = wallRaw(P, H, p.mat, 15, nC).concat(losaRaw(L, A, K.cu_losa / 100), firmeRaw(L, A, K.cu_firme / 100));
+    r = { area: L * A, eq: [fmt(L) + ' m', fmt(A) + ' m', fmt(H) + ' m de alto'], dims: fmt(L) + ' m × ' + fmt(A) + ' m', sub: MAT[p.mat].l + ', losa y firme', extra: fmt(P) + ' m de muro · ' + nC + ' castillos', draw: (W, h, b) => drawPlan(W, h, b, L, A, 1, 'room') };
+  } else {
+    if (T.shape === 'muro') r = { area: L * H, largo: L, eq: [fmt(L) + ' m de largo', fmt(H) + ' m de alto'], dims: fmt(L) + ' m × ' + fmt(H) + ' m', draw: (W, h, b) => drawWall(W, h, b, L, H, null, 0, 0) };
+    else if (T.shape === 'lineal') r = { chip: fmt(L) + ' m', largo: L, eq: [fmt(L) + ' m lineales'], dims: fmt(L) + ' m', draw: (W, h, b) => drawStrip(W, h, b, L, T.f[0][3], false) };
+    else r = { area: L * A, eq: [fmt(L) + ' m de largo', fmt(A) + ' m de ancho'], dims: fmt(L) + ' m × ' + fmt(A) + ' m', draw: (W, h, b) => drawPlan(W, h, b, L, A, 0.5, 'mesh') };
+  }
+  /* medidas sobre las que el administrador puede agregar materiales */
+  const M = { area: r.area || 0, largo: r.largo != null ? r.largo : (A ? 2 * (L + A) : L), fijo: 1 };
+  raw = raw.filter((x) => !T.off[fam(x[0])]);
+  T.extra.forEach((e) => { if (CAT[e.mat] && e.rate > 0) raw.push([e.mat, e.rate * M[e.per], e.use || 'Adicional', e.per === 'fijo' ? 1 : 0]); });
+  r.sub = r.sub || T.d; r.extra = r.extra || ''; r.M = M;
+  const rows = finalize(raw, w, names);
+  const total = r2(rows.reduce((s, x) => s + x.cost, 0));
+  r.rows = rows; r.total = total; r.type = type; r.T = T;
+  r.chip = r.chip || fmt(r.area) + ' m²';
+  r.title = T.t + ' de ' + r.dims;
+  r.lead = r.lead || (rows[0] ? num(rows[0].qty) + ' ' + (rows[0].u === 'pz' ? 'piezas' : rows[0].u) : 'Sin materiales');
+  r.text = r.title + ' (' + r.sub + ')\n' + rows.map((i) => '• ' + i.n + ': ' + qU(i.qty, i.u)).join('\n') + '\nTotal estimado: ' + money(total) + '\nCalculado con BIIN';
+  return r;
+}
+function mergeRows(lists) {
+  const map = new Map();
+  lists.forEach((rows) => rows.forEach((x) => {
+    const k = x.n, y = map.get(k);
+    if (y) { y.qty = r2(y.qty + x.qty); y.cost = r2(y.cost + x.cost); y.use = 'Toda la obra'; }
+    else map.set(k, Object.assign({}, x));
+  }));
+  return Array.from(map.values());
+}
+
+/* ============ dibujos ============ */
+function drawWall(W, Ht, big, L, H, m, nC, coat) {
+  const k = big ? { px: 60, py: 50, base: 23, g: 20, cw: 8, jw: 1.5, min: 6, gw: 5 } : { px: 52, py: 28, base: 14, g: 12, cw: 5, jw: 1.2, min: 5, gw: 4 };
+  const sc = Math.min((W - k.px) / L, (Ht - k.py) / H), dw = L * sc, dh = H * sc, dx = (W - dw) / 2, dy = Ht - k.base - dh;
+  let s = '<rect x="' + dx + '" y="' + dy + '" width="' + dw + '" height="' + dh + '" fill="#E3E8F2"></rect>';
+  if (m) {
+    let uw = m.uw, uh = m.uh, j = '';
+    while (uh * sc < k.min) { uw *= 2; uh *= 2; }
+    const nr = Math.ceil(H / uh);
+    for (let r = 0; r < nr; r++) {
+      const yb = dy + dh - r * uh * sc, yt = Math.max(dy, yb - uh * sc);
+      if (r > 0) j += 'M' + dx + ' ' + yb + 'H' + (dx + dw);
+      for (let xx = (r % 2 ? uw / 2 : uw); xx < L; xx += uw) j += 'M' + (dx + xx * sc) + ' ' + yb + 'V' + yt;
+    }
+    s += '<path d="' + j + '" stroke="#fff" stroke-width="' + k.jw + '" fill="none"></path>';
+  }
+  if (coat) s += '<rect x="' + dx + '" y="' + dy + '" width="' + dw * 0.66 + '" height="' + dh + '" fill="#41D5FB" opacity="' + (m ? 0.78 : 1) + '"></rect>';
+  if (nC) {
+    const h2 = k.cw / 2;
+    let c = 'M' + dx + ' ' + (dy + h2) + 'H' + (dx + dw);
+    for (let i = 0; i < nC; i++) { const cx = dx + h2 + (dw - k.cw) * i / (nC - 1); c += 'M' + cx + ' ' + dy + 'V' + (dy + dh); }
+    s += '<path d="' + c + '" stroke="#222B45" stroke-width="' + k.cw + '" fill="none"></path>';
+  }
+  return s + '<path d="M' + (big ? 20 : 16) + ' ' + (Ht - k.g) + 'H' + (W - (big ? 20 : 16)) + '" stroke="#41D5FB" stroke-width="' + k.gw + '" stroke-linecap="round" fill="none"></path>';
+}
+function drawPlan(W, Ht, big, L, A, step, kind) {
+  const pad = big ? 30 : 16, sc = Math.min((W - 60) / L, (Ht - pad * 2) / A), dw = L * sc, dh = A * sc, dx = (W - dw) / 2, dy = (Ht - dh) / 2;
+  let st = step, g = '';
+  while (st * sc < (big ? 9 : 7)) st *= 2;
+  for (let x = st; x < L - 1e-6; x += st) g += 'M' + (dx + x * sc) + ' ' + dy + 'V' + (dy + dh);
+  for (let y = st; y < A - 1e-6; y += st) g += 'M' + dx + ' ' + (dy + y * sc) + 'H' + (dx + dw);
+  let s = '<rect x="' + dx + '" y="' + dy + '" width="' + dw + '" height="' + dh + '" rx="' + (kind === 'room' ? 0 : 4) + '" fill="' + (kind === 'tile' ? '#41D5FB' : '#E3E8F2') + '"></rect>';
+  if (kind === 'room') {
+    const t = big ? 9 : 6;
+    s += '<rect x="' + (dx + t / 2) + '" y="' + (dy + t / 2) + '" width="' + (dw - t) + '" height="' + (dh - t) + '" fill="#fff" stroke="#222B45" stroke-width="' + t + '"></rect>';
+    s += '<path d="M' + (dx + dw * 0.35) + ' ' + (dy + dh - t / 2) + 'h' + Math.min(dw * 0.25, 0.9 * sc) + '" stroke="#41D5FB" stroke-width="' + t + '"></path>';
+  } else {
+    s += '<path d="' + g + '" stroke="' + (kind === 'rebar' ? '#222B45' : '#fff') + '" stroke-width="' + (kind === 'rebar' ? 1.1 : kind === 'tile' ? 2 : 1.2) + '" fill="none" opacity="' + (kind === 'rebar' ? 0.55 : 1) + '"></path>';
+    if (kind !== 'tile') s += '<rect x="' + dx + '" y="' + dy + '" width="' + dw + '" height="' + dh + '" rx="4" fill="none" stroke="#41D5FB" stroke-width="' + (big ? 5 : 4) + '"></rect>';
+  }
+  return s;
+}
+function drawStrip(W, Ht, big, M, max, ground) {
+  const frac = 0.3 + 0.7 * Math.min(1, M / max), len = (W - 60) * frac, x0 = (W - len) / 2, bh = big ? 56 : 40, y0 = (Ht - bh) / 2 - (ground ? 6 : 0);
+  const n = Math.max(4, Math.round(len / (big ? 16 : 12)));
+  let t = '';
+  for (let i = 0; i <= n; i++) t += 'M' + (x0 + 4 + (len - 8) * i / n) + ' ' + (y0 + 6) + 'V' + (y0 + bh - 6);
+  let s = '';
+  if (ground) s += '<rect x="' + (x0 - 14) + '" y="' + (y0 + bh) + '" width="' + (len + 28) + '" height="' + (big ? 18 : 14) + '" rx="3" fill="#C9D1E0"></rect>';
+  s += '<rect x="' + x0 + '" y="' + y0 + '" width="' + len + '" height="' + bh + '" rx="4" fill="#E3E8F2"></rect>';
+  s += '<path d="' + t + '" stroke="#8A93A8" stroke-width="1.5" fill="none"></path>';
+  s += '<path d="M' + x0 + ' ' + (y0 + 8) + 'H' + (x0 + len) + 'M' + x0 + ' ' + (y0 + bh - 8) + 'H' + (x0 + len) + '" stroke="#222B45" stroke-width="' + (big ? 4 : 3) + '" fill="none"></path>';
+  if (ground) s += '<path d="M16 ' + (Ht - 10) + 'H' + (W - 16) + '" stroke="#41D5FB" stroke-width="4" stroke-linecap="round" fill="none"></path>';
+  return s;
+}
+
+/* ============ estado ============ */
+let S, gen = 0;
+function seed(empty) {
+  gen++;
+  const view = S ? S.view : 'phone', auto = S ? S.auto : true, adm = S ? S.adm : { tab: 'cat', sel: 'barda' };
+  S = {
+    view: view, screen: 'acceso', user: null, margen: 12, offline: false, auto: auto, menu: false,
+    auth: newAuth(null),
+    calc: { type: ORDER[0], p: defaults(ORDER[0]) }, editing: null, msg: '', saved: false,
+    obras: [], sols: [], creds: [], envios: [], hist: [], sheet: null, note: null, toast: '', install: true,
+    fin: null, pending: null, ops: { tab: 'sol' }, adm: adm, nextEnv: 1044, nextSol: 417,
+    inv: [
+      ['block15', 12400, 1645, 2000], ['cemento', 860, 96, 150], ['varilla', 140, 122, 100], ['arena', 85, 14, 20], ['grava', 60, 8, 20], ['alambron', 900, 180, 200], ['recocido', 45, 30, 40],
+      ['block12', 6000, 0, 1500], ['block20', 5200, 0, 1500], ['ladrillo', 18000, 0, 4000], ['tabique', 9000, 0, 3000], ['malla', 120, 0, 30],
+      ['azulejo', 640, 0, 100], ['pega', 300, 0, 60], ['boquilla', 180, 0, 40], ['crucetas', 150, 0, 30], ['pint19', 60, 0, 15], ['pint4', 90, 0, 20], ['sellador', 70, 0, 15], ['kit', 80, 0, 20]
+    ].map((r) => ({ key: r[0], disp: r[1], apart: r[2], aviso: r[3] }))
+  };
+  S.sols = [
+    { id: 's2', folio: 'BN-2026-00415', cliente: 'Arq. Laura Robles', obra: 'Bodega Km 9', monto: 38400, dias: 180, st: 'En revisión', fecha: addD(-1) },
+    { id: 's3', folio: 'BN-2026-00414', cliente: 'Mtro. Jesús Valenzuela', obra: 'Casa Villa Bonita', monto: 6250, dias: 30, st: 'Aprobada', fecha: addD(-2) }
+  ];
+  S.envios = [
+    { id: 'EN-1039', obra: 'Bodega Km 9', mat: 'Cemento y varilla', prov: 'Proveedor A', date: addD(0), win: '', st: 'Con retraso', mine: false },
+    { id: 'EN-1035', obra: 'Casa Villa Bonita', mat: 'Block', prov: 'Proveedor C', date: addD(-2), win: '', st: 'Entregado', mine: false }
+  ];
+  S.hist = [{ t: 'Línea autorizada', sub: dShort(addD(-4)), amt: CFG.linea }];
+  if (!empty) {
+    const mk = (type, label, over) => ({ id: 'c' + Math.random().toString(36).slice(2, 8), type: type, label: label, p: Object.assign(defaults(type), over || {}) });
+    S.obras = [
+      { id: 'o1', name: 'Casa Los Olivos', city: 'Hermosillo, Son.', calcs: [mk('barda', 'Barda perimetral'), mk('firme', 'Firme de cochera', { L: 6, A: 4 }), mk('aplanado', 'Aplanado de fachada', { L: 15, H: 2.5 })] },
+      { id: 'o2', name: 'Local Av. Reforma', city: 'Hermosillo, Son.', calcs: [mk('losa', 'Losa de azotea', { L: 8, A: 4 }), mk('muro', 'Muro divisorio', { L: 5.5, H: 2.5 })] }
+    ];
+    const b = calc('barda', defaults('barda'));
+    S.sols.unshift({ id: 's1', folio: 'BN-2026-00416', cliente: 'Tú (cliente demo)', obra: 'Casa Los Olivos', monto: b.total, dias: 90, st: 'Aprobada', fecha: addD(0), mine: true });
+    S.creds = [mkCred('BN-2026-00416', 'barda', 'Casa Los Olivos', b.total, 90)];
+    S.hist.unshift({ t: 'Crédito para barda', sub: dShort(addD(0)) + ' · Casa Los Olivos', amt: b.total });
+    S.envios.unshift(
+      { id: 'EN-1042', obra: 'Casa Los Olivos', mat: 'Block y cemento', prov: 'Proveedor A', date: addD(1), win: '8 a 12 h', st: 'En camino', mine: true },
+      { id: 'EN-1043', obra: 'Casa Los Olivos', mat: 'Varilla, arena y grava', prov: 'Proveedor B', date: addD(3), win: '', st: 'Programado', mine: true }
+    );
+  }
+}
+function mkCred(folio, concept, obra, m, dias) {
+  const costo = m * CFG.tasa / 100 * dias / 30, n = dias / 15, amt = r2((m + costo) / n);
+  return { folio: folio, concept: concept, obra: obra, monto: m, dias: dias, pagos: Array.from({ length: n }, (_, i) => ({ date: addD(15 * (i + 1)), amt: amt, paid: false })) };
+}
+const usado = () => r2(S.creds.reduce((s, c) => s + c.monto * c.pagos.filter((p) => !p.paid).length / c.pagos.length, 0));
+const disponible = () => r2(CFG.linea - usado());
+const pendientes = () => { const l = []; S.creds.forEach((c) => c.pagos.forEach((p) => { if (!p.paid) l.push({ c: c, p: p }); })); return l.sort((a, b) => a.p.date - b.p.date); };
+const SING = { bultos: 'bulto', hojas: 'hoja', cajas: 'caja', bolsas: 'bolsa', cubetas: 'cubeta', galones: 'galón' };
+const qU = (q, u) => num(q) + ' ' + (q === 1 && SING[u] ? SING[u] : u);
+const eqSep = (e) => (/^(zapata|sección)/.test(e) ? '·' : '×');
+const cur = () => calc(S.calc.type, S.calc.p);
+const obraRows = (o) => mergeRows(o.calcs.map((c) => calc(c.type, c.p).rows));
+const obraTotal = (o) => r2(o.calcs.reduce((s, c) => s + calc(c.type, c.p).total, 0));
+const mySol = () => S.sols.find((s) => s.mine && s.st === 'En revisión');
+
+/* ============ iconos ============ */
+const LOGO = (s) => '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12,3 21,7.5 12,12 3,7.5" fill="#41D5FB"></polygon><polygon points="3,10 12,14.5 12,21 3,16.5" fill="#fff"></polygon><polygon points="12,14.5 21,10 21,16.5 12,21" fill="#8A93A8"></polygon></svg>';
+const BACK = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>';
+const ICONS = {
+  barda: '<polygon points="4,18 10,15 44,31 38,34" fill="#41D5FB"></polygon><polygon points="4,18 38,34 38,44 4,28" fill="#fff"></polygon><polygon points="38,34 44,31 44,41 38,44" fill="#8A93A8"></polygon>',
+  muro: '<polygon points="12,8 18,5 38,15 32,18" fill="#41D5FB"></polygon><polygon points="12,8 32,18 32,43 12,33" fill="#C9D1E0"></polygon><polygon points="32,18 38,15 38,40 32,43" fill="#222B45"></polygon>',
+  losa: '<polygon points="24,12 44,22 24,32 4,22" fill="#41D5FB"></polygon><polygon points="4,22 24,32 24,38 4,28" fill="#C9D1E0"></polygon><polygon points="24,32 44,22 44,28 24,38" fill="#222B45"></polygon>',
+  firme: '<polygon points="4,26 24,36 44,26 44,30 24,40 4,30" fill="#222B45"></polygon><polygon points="24,16 44,26 24,36 4,26" fill="#C9D1E0"></polygon><path d="M14 21l20 10M34 21L14 31" stroke="#fff" stroke-width="1.5"></path>',
+  cimentacion: '<polygon points="24,26 44,36 24,46 4,36" fill="#222B45"></polygon><polygon points="16,12 24,16 24,36 16,32" fill="#C9D1E0"></polygon><polygon points="24,16 32,12 32,32 24,36" fill="#8A93A8"></polygon><polygon points="24,8 32,12 24,16 16,12" fill="#41D5FB"></polygon>',
+  castillos: '<polygon points="8,19 13,21.5 13,44 8,41.5" fill="#C9D1E0"></polygon><polygon points="31,30.5 36,33 36,44 31,41.5" fill="#C9D1E0"></polygon><polygon points="6,12 12,9 44,25 38,28" fill="#41D5FB"></polygon><polygon points="6,12 38,28 38,34 6,18" fill="#222B45"></polygon>',
+  aplanado: '<polygon points="12,8 32,18 32,43 12,33" fill="#C9D1E0"></polygon><polygon points="12,8 23,13.5 23,38.5 12,33" fill="#41D5FB"></polygon><polygon points="32,18 38,15 38,40 32,43" fill="#222B45"></polygon><polygon points="12,8 18,5 38,15 32,18" fill="#E3E8F2"></polygon>',
+  azulejo: '<polygon points="4,24 24,34 44,24 44,27 24,37 4,27" fill="#222B45"></polygon><polygon points="24,14 44,24 24,34 4,24" fill="#41D5FB"></polygon><path d="M14 19l20 10M34 19L14 29" stroke="#fff" stroke-width="2"></path>',
+  pintura: '<rect x="7" y="8" width="27" height="11" rx="4" fill="#41D5FB"></rect><path d="M34 13.5h7v10H22v5" fill="none" stroke="#222B45" stroke-width="2.5"></path><rect x="18.5" y="28" width="7" height="15" rx="3" fill="#222B45"></rect>',
+  cuarto: '<polygon points="4,36 4,16 24,6 24,26" fill="#41D5FB"></polygon><polygon points="24,26 24,6 44,16 44,36" fill="#222B45"></polygon><polygon points="24,26 44,36 24,46 4,36" fill="#C9D1E0"></polygon>'
+};
+const NAVI = {
+  inicio: ['Calcular', '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="3"></rect><path d="M9 8h6M9 13h.01M12 13h.01M15 13h.01M9 17h.01M12 17h.01M15 17h.01"></path></svg>'],
+  proy: ['Proyectos', '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>'],
+  cred: ['Crédito', '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="3"></rect><path d="M3 10.5h18"></path></svg>'],
+  cuenta: ['Cuenta', '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>']
+};
+const nav = (on) => '<nav class="nav" aria-label="Principal">' + Object.keys(NAVI).map((k) => '<button type="button" data-a="tab" data-arg="' + k + '"' + (k === on ? ' aria-current="page"' : '') + '><span>' + NAVI[k][1] + '</span>' + NAVI[k][0] + '</button>').join('') + '</nav>';
+
+/* ============ pantallas de celular ============ */
+function vAcceso() {
+  const a = S.auth;
+  const art = '<div style="height:230px;border-radius:32px;background:#fff;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;flex:none"><div style="position:absolute;width:200px;height:200px;border-radius:50%;background:#222B45"></div><svg width="220" height="190" viewBox="0 0 230 200" style="position:relative" aria-hidden="true"><polygon points="40,120 40,60 115,22 115,82" fill="#41D5FB"></polygon><polygon points="115,82 115,22 190,60 190,120" fill="#E3E8F2"></polygon><polygon points="115,82 190,120 115,158 40,120" fill="#fff"></polygon><polygon points="40,120 115,158 115,170 40,132" fill="#C9D1E0"></polygon><polygon points="115,158 190,120 190,132 115,170" fill="#8A93A8"></polygon><polygon points="136,60 160,72 160,96 136,84" fill="#222B45"></polygon><polygon points="62,84 86,72 86,108 62,120" fill="#222B45"></polygon><polygon points="100,112 126,125 108,134 82,121" fill="#FB4A46"></polygon></svg></div>';
+  if (sb) return accesoSB(a, art);
+  let body;
+  if (a.step === 1) body = '<div class="col g8"><h1 style="font-size:32px;line-height:1.1;font-weight:700">Entra con tu celular</h1><p style="font-size:16px;line-height:1.4;color:#5A6379">' + (a.after ? 'Para pedir o ver tu crédito necesitas una cuenta. ' : '') + 'Sin contraseñas. Te mandamos un código por SMS.</p></div>'
+    + '<div class="col g6"><label for="cel" class="lbl">Tu número a 10 dígitos</label><div class="' + (a.err ? 'bad ' : '') + 'inp" style="display:flex;align-items:center;height:68px;border-radius:20px;gap:10px;padding:0 18px"><span style="font-size:22px;font-weight:600;color:#5A6379">+52</span><input id="cel" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="10" placeholder="662 123 4567" value="' + esc(a.cel) + '" data-f="auth.cel" data-enter="authSend" style="flex:1;min-width:0;height:56px;border:0;background:transparent;font:700 24px Lexend,sans-serif"></div>' + (a.err ? '<div class="err" role="alert">' + a.err + '</div>' : '') + '</div>'
+    + '<div style="flex:1"></div><button type="button" class="btn cy" data-a="authSend" style="height:62px">Enviar código</button><button type="button" data-a="guest" style="min-height:44px;font-size:16px;font-weight:600;text-decoration:underline">Seguir sin cuenta</button>';
+  else body = '<div class="col g8"><h1 style="font-size:32px;line-height:1.1;font-weight:700">Escribe tu código</h1><p style="font-size:16px;line-height:1.4;color:#5A6379">Lo mandamos al +52 ' + esc(a.cel) + '.</p></div>'
+    + '<div class="col g6"><label for="cod" class="lbl">Código de 6 números</label><input id="cod" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" value="' + esc(a.cod) + '" data-f="auth.cod" data-enter="authOk" class="' + (a.err ? 'bad' : '') + '" style="height:72px;border:0;border-radius:20px;background:#fff;text-align:center;letter-spacing:12px;font:700 32px Lexend,sans-serif;width:100%">' + (a.err ? '<div class="err" role="alert">' + a.err + '</div>' : '') + '</div>'
+    + '<button type="button" data-a="authBack" style="min-height:44px;font-size:16px;font-weight:600;text-decoration:underline">Cambiar número o reenviar código</button><div style="flex:1"></div><button type="button" class="btn cy" data-a="authOk" style="height:62px">Entrar</button>';
+  return '<div class="scr" data-k="acceso' + a.step + '"><div class="main" style="padding:28px 20px 24px;gap:22px">' + art + '<div class="col" style="flex:1;gap:18px">' + body + '</div></div></div>';
+}
+function accesoSB(a, art) {
+  const up = a.mode === 'up', lnk = 'min-height:44px;font-size:16px;font-weight:600;text-decoration:underline';
+  return '<div class="scr" data-k="accesoSB"><div class="main" style="padding:28px 20px 24px;gap:16px">' + art.replace('height:230px', 'height:170px')
+    + '<div class="col g8"><h1 style="font-size:30px;line-height:1.1;font-weight:700">' + (up ? 'Crea tu cuenta' : 'Entra a tu cuenta') + '</h1><p style="font-size:16px;line-height:1.4;color:#5A6379">' + (a.after ? 'Para guardar tus obras o ver tu crédito necesitas una cuenta.' : 'Con tu correo y una contraseña.') + '</p></div>'
+    + (a.info ? '<div class="status" role="status">' + esc(a.info) + '</div>' : '')
+    + '<div class="col g6"><label for="aem" class="lbl">Correo</label><input id="aem" class="inp' + (a.err ? ' bad' : '') + '" type="email" autocomplete="email" placeholder="tucorreo@ejemplo.com" value="' + esc(a.email) + '" data-f="auth.email" data-enter="authGo"></div>'
+    + '<div class="col g6"><label for="apw" class="lbl">Contraseña</label><input id="apw" class="inp' + (a.err ? ' bad' : '') + '" type="password" autocomplete="' + (up ? 'new-password' : 'current-password') + '" placeholder="Mínimo 6 caracteres" data-keep="1" data-f="auth.pass" data-enter="authGo">' + (a.err ? '<div class="err" role="alert">' + esc(a.err) + '</div>' : '') + '</div>'
+    + '<div style="flex:1"></div><button type="button" class="btn cy" data-a="authGo" style="height:62px;flex:none"' + (a.busy ? ' disabled' : '') + '>' + (a.busy ? 'Un momento…' : up ? 'Crear cuenta' : 'Entrar') + '</button>'
+    + '<button type="button" data-a="authMode" style="' + lnk + '">' + (up ? 'Ya tengo cuenta' : 'Crear una cuenta nueva') + '</button>'
+    + '<button type="button" data-a="guest" style="' + lnk + ';font-weight:500">Seguir sin cuenta</button></div></div>';
+}
+function vBoot() {
+  return '<div class="scr" data-k="boot"><div class="main" style="align-items:center;justify-content:center;gap:16px"><div class="lgi pulse" style="width:72px;height:72px;border-radius:24px">' + LOGO(44) + '</div><div class="sub" role="status">Conectando…</div></div></div>';
+}
+function vInicio() {
+  const tiles = ORDER.filter((k) => TYPES[k].on).map((k, i) => '<button type="button" class="tile' + (i === 0 ? ' on' : '') + '" data-a="pick" data-arg="' + k + '"><svg width="52" height="52" viewBox="0 0 48 48" aria-hidden="true">' + ICONS[TYPES[k].icon] + '</svg><b>' + esc(TYPES[k].t) + '</b><i>' + esc(TYPES[k].d) + '</i></button>').join('');
+  return '<div class="scr" data-k="inicio"><div class="main" style="padding:28px 20px 24px;gap:20px"><div style="display:flex;align-items:center;gap:10px"><div class="lgi">' + LOGO(24) + '</div><div style="font-size:22px;font-weight:700;letter-spacing:1px">BIIN</div></div>'
+    + '<div class="col g6"><h1 style="font-size:32px;line-height:1.1;font-weight:700">¿Qué vas a construir?</h1><p style="font-size:16px;line-height:1.4;color:#5A6379">Elige una opción y te decimos cuánto material necesitas.</p></div>'
+    + (S.pending ? '<div class="offl" role="status"><div><strong style="font-weight:600">Solicitud guardada.</strong> Se envía sola cuando vuelva la señal.</div></div>' : '')
+    + '<div class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">' + tiles + '</div></div>' + nav('inicio') + '</div>';
+}
+function inputsHTML(T, p) {
+  const n = T.f.length;
+  return '<div class="grid" style="grid-template-columns:repeat(' + (n === 1 ? 1 : 2) + ',minmax(0,1fr));gap:12px">' + T.f.map((f, i) =>
+    '<div class="col g6"' + (n === 3 && i === 2 ? ' style="grid-column:1/-1"' : '') + '><label for="f' + f[0] + '" class="lbl">' + esc(f[1]) + '</label><div class="stepper"><button type="button" class="pl" data-a="step" data-arg="' + f[0] + ',-1" aria-label="Menos">−</button><input id="f' + f[0] + '" type="number" inputmode="decimal" step="' + f[4] + '" value="' + fmt(p[f[0]]) + '" data-num="' + f[0] + '"><button type="button" class="nv" data-a="step" data-arg="' + f[0] + ',1" aria-label="Más">+</button></div></div>').join('') + '</div>';
+}
+function optsHTML(T, p, cls, h) {
+  return T.o.map((o) => '<div class="col g6"><div class="lbl">' + esc(o[1]) + '</div><div class="grid" style="grid-template-columns:repeat(' + o[2].length + ',minmax(0,1fr))">' + o[2].map((v) => '<button type="button" class="' + cls + '" data-a="opt" data-arg="' + o[0] + ',' + v[0] + '" aria-pressed="' + (p[o[0]] === v[0]) + '"' + (h ? ' style="height:' + h + 'px"' : '') + '>' + esc(v[1]) + '</button>').join('') + '</div></div>').join('');
+}
+function vSim() {
+  const T = TYPES[S.calc.type], p = S.calc.p, r = cur();
+  return '<div class="scr" data-k="sim"><div class="main"><div class="hd"><button type="button" class="bk" data-a="go" data-arg="inicio" aria-label="Volver al inicio">' + BACK + '</button><div class="col"><h1 class="h1">' + esc(T.t) + '</h1><div class="sub">' + esc(T.h) + '</div></div></div>'
+    + (S.offline ? '<div class="offl" role="status"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#41D5FB" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex:none"><path d="M3 9c5-5 13-5 18 0M6.5 12.5c3-3 8-3 11 0M10 16c1.2-1 2.8-1 4 0M4 4l16 16"></path></svg><div><strong style="font-weight:600">Sin conexión.</strong> Sigue calculando: todo se guarda en tu celular.</div></div>' : '')
+    + '<div class="card" style="padding:14px 10px 12px;display:flex;flex-direction:column;align-items:center;gap:4px"><svg width="100%" viewBox="0 0 342 140" role="img" aria-label="Dibujo con tus medidas">' + r.draw(342, 140, false) + '</svg><div style="display:flex;flex-wrap:wrap;justify-content:center;gap:4px 8px;align-items:center;font-size:15px;font-weight:600">' + r.eq.map((e, i) => (i ? '<span style="color:#8A93A8">' + eqSep(e) + '</span>' : '') + '<span>' + e + '</span>').join('') + '<span style="color:#8A93A8">=</span><span class="chip">' + r.chip + '</span></div></div>'
+    + inputsHTML(T, p) + optsHTML(T, p, 'pill')
+    + '<div class="card col g6" style="border-radius:20px;padding:14px 16px"><div style="display:flex;justify-content:space-between;align-items:baseline"><label for="desp" class="lbl">Desperdicio</label><span style="font-size:20px;font-weight:700">' + p.w + '%</span></div><input id="desp" type="range" min="0" max="15" step="1" value="' + p.w + '" data-range="w"><div class="sm">Piezas que se rompen o se cortan. Lo normal es ' + T.w + '%.</div></div>'
+    + '</div><div class="foot" style="gap:14px"><div class="col" style="flex:1;min-width:0"><div class="sm">' + r.lead + ' · costo estimado</div><div style="font-size:24px;font-weight:700">' + money(r.total) + '</div></div><button type="button" class="btn cy" data-a="verRes" style="font-size:17px">Ver materiales</button></div></div>';
+}
+function vLoad() {
+  const sk = (a, b, c) => '<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #EEF1F7"><div class="col g8"><div style="width:' + a + 'px;height:14px;border-radius:7px;background:#E3E8F2"></div><div style="width:' + b + 'px;height:10px;border-radius:5px;background:#E3E8F2"></div></div><div style="width:' + c + 'px;height:18px;border-radius:9px;background:#E3E8F2"></div></div>';
+  return '<div class="scr" data-k="load" aria-busy="true"><div class="main" style="gap:14px"><div class="hd"><div class="bk"></div><div class="col" role="status"><div style="font-size:24px;font-weight:700;line-height:1.1">Calculando tu material</div><div class="sub">Tarda unos segundos</div></div></div>'
+    + '<div class="pulse" style="height:104px;border-radius:24px;background:#222B45;padding:20px;display:flex;flex-direction:column;gap:12px;flex:none"><div style="width:150px;height:12px;border-radius:6px;background:#3A4563"></div><div style="width:210px;height:30px;border-radius:10px;background:#3A4563"></div></div>'
+    + '<div class="card pulse" style="padding:6px 16px">' + sk(190, 120, 64) + sk(150, 130, 76) + sk(90, 130, 52) + sk(170, 110, 44) + sk(130, 90, 56) + '</div>'
+    + '<div class="grid" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div style="height:56px;border-radius:18px;background:#fff"></div><div style="height:56px;border-radius:18px;background:#fff"></div><div style="height:56px;border-radius:18px;background:#fff"></div></div></div></div>';
+}
+function vRes() {
+  const r = cur();
+  return '<div class="scr" data-k="res"><div class="main" style="gap:14px"><div class="hd"><button type="button" class="bk" data-a="go" data-arg="sim" aria-label="Cambiar medidas">' + BACK + '</button><div class="col"><h1 class="h1" style="font-size:24px">Lo que necesitas</h1><div class="sub">' + esc(r.title + ' · ' + r.sub) + '</div></div></div>'
+    + '<div class="dark" style="display:flex;justify-content:space-between;align-items:flex-end"><div class="col g2"><div class="k">Costo estimado de material</div><div class="big">' + money(r.total) + '</div></div><div class="chip" style="border-radius:12px;padding:6px 10px;font-size:14px;font-weight:600;color:#222B45">' + r.chip + '</div></div>'
+    + '<div class="card" style="padding:6px 16px">' + (r.rows.length ? '' : '<div class="item"><div style="font-size:15px;line-height:1.4;color:#5A6379">Esta categoría todavía no tiene materiales. Se agregan en el panel de Super administrador.</div></div>') + r.rows.map((it) => '<div class="item"><div class="col g2" style="min-width:0"><div style="font-size:16px;font-weight:600">' + esc(it.n) + '</div><div style="font-size:13px;color:#5A6379">' + it.use + ' · ' + money(it.price) + ' c/u</div></div><div class="col g2" style="align-items:flex-end;white-space:nowrap"><div style="font-size:18px;font-weight:700">' + qU(it.qty, it.u) + '</div><div style="font-size:13px;color:#5A6379">' + money(it.cost) + '</div></div></div>').join('') + '</div>'
+    + '<div class="grid" style="grid-template-columns:repeat(4,minmax(0,1fr))"><button type="button" class="pill" style="font-size:15px" data-a="save">' + (S.saved ? 'Guardado' : S.editing ? 'Actualizar' : 'Guardar') + '</button><a class="pill" style="font-size:15px;display:flex;align-items:center;justify-content:center" target="_blank" rel="noopener" href="https://wa.me/?text=' + encodeURIComponent(r.text) + '">WhatsApp</a><button type="button" class="pill" style="font-size:15px" data-a="doc" data-arg="pdf,calc">PDF</button><button type="button" class="pill" style="font-size:15px" data-a="doc" data-arg="xls,calc">Excel</button></div>'
+    + (S.msg ? '<div role="status" class="status">' + esc(S.msg) + '</div>' : '')
+    + '<div class="sm">Precios estimados con entrega en obra. ' + esc(r.T.note) + '</div></div>'
+    + '<div class="foot col g8" style="align-items:stretch"><button type="button" class="btn cy" data-a="fin" data-arg="calc">Financia estos materiales</button><div style="text-align:center;font-size:13px;color:#5A6379">Construye ahora, paga después</div></div></div>';
+}
+function installCard() {
+  return '<div role="dialog" aria-label="Instalar BIIN" class="card col g12" style="box-shadow:0 14px 32px rgba(34,43,69,.16)"><div style="display:flex;align-items:center;gap:12px"><div class="lgi" style="width:52px;height:52px;border-radius:16px">' + LOGO(30) + '</div><div class="col g2"><div style="font-size:18px;font-weight:700">Instala BIIN en tu celular</div><div style="font-size:14px;line-height:1.35;color:#5A6379">Abre más rápido y funciona sin internet. No ocupa casi espacio.</div></div></div><div style="display:flex;gap:8px"><button type="button" class="btn pl" style="height:54px;font-size:16px;font-weight:600;border-radius:18px;padding:0 18px" data-a="installNo">Ahora no</button><button type="button" class="btn cy f" style="height:54px;font-size:16px;border-radius:18px" data-a="installOk">Instalar app</button></div></div>';
+}
+function vProy() {
+  if (!S.obras.length) return '<div class="scr" data-k="proy0"><div class="main" style="padding:28px 20px 20px"><h1 style="font-size:30px;font-weight:700">Mis proyectos</h1><div class="col g14" style="flex:1;align-items:center;justify-content:center;text-align:center;padding:0 12px"><svg width="150" height="120" viewBox="0 0 150 120" aria-hidden="true"><polygon points="75,70 135,95 75,118 15,95" fill="#E3E8F2"></polygon><polygon points="45,52 75,64 75,88 45,76" fill="#fff"></polygon><polygon points="75,64 105,52 105,76 75,88" fill="#C9D1E0"></polygon><polygon points="75,40 105,52 75,64 45,52" fill="#41D5FB"></polygon><path d="M75 8v18M66 17h18" stroke="#222B45" stroke-width="4" stroke-linecap="round"></path></svg><h2 style="font-size:22px;font-weight:700">Aquí van a aparecer tus obras</h2><p style="font-size:16px;line-height:1.4;color:#5A6379">Haz tu primer cálculo y guárdalo. Lo vas a encontrar aquí, aunque no tengas señal.</p><button type="button" class="btn nv" style="font-size:17px;padding:0 28px" data-a="go" data-arg="inicio">Hacer mi primer cálculo</button></div>' + (S.install ? installCard() : '') + '</div>' + nav('proy') + '</div>';
+  const nCalc = S.obras.reduce((s, o) => s + o.calcs.length, 0), tot = S.obras.reduce((s, o) => s + obraTotal(o), 0);
+  return '<div class="scr" data-k="proy"><div class="main" style="padding:28px 20px 24px"><div class="sb"><h1 style="font-size:30px;font-weight:700">Mis proyectos</h1><button type="button" class="nv" data-a="go" data-arg="inicio" aria-label="Nuevo cálculo" style="width:52px;height:52px;border-radius:18px;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button></div>'
+    + '<div class="dark col g4"><div class="k">Total acumulado</div><div class="big">' + money(tot) + '</div><div class="k">' + S.obras.length + (S.obras.length === 1 ? ' obra' : ' obras') + ' · ' + nCalc + (nCalc === 1 ? ' cálculo' : ' cálculos') + '</div></div>'
+    + S.obras.map((o) => '<section class="card col g4"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div class="col g2"><h2 style="font-size:19px;font-weight:700">' + esc(o.name) + '</h2><div style="font-size:13px;color:#5A6379">' + esc(o.city) + ' · ' + o.calcs.length + (o.calcs.length === 1 ? ' cálculo' : ' cálculos') + '</div></div><div style="font-size:19px;font-weight:700;white-space:nowrap">' + money(obraTotal(o)) + '</div></div>'
+      + o.calcs.map((c) => { const r = calc(c.type, c.p); return '<button type="button" class="rowl" data-a="openCalc" data-arg="' + o.id + ',' + c.id + '"><span>' + esc(c.label) + ' <span style="color:#5A6379;font-size:13px">· ' + r.chip + '</span></span><span style="font-weight:600;white-space:nowrap">' + money(r.total) + '</span></button>'; }).join('')
+      + '<div class="grid" style="grid-template-columns:repeat(3,minmax(0,1fr));margin-top:8px"><button type="button" class="pl" style="height:48px;border-radius:16px;font-weight:600;font-size:14px" data-a="doc" data-arg="pdf,' + o.id + '">PDF</button><button type="button" class="pl" style="height:48px;border-radius:16px;font-weight:600;font-size:14px" data-a="doc" data-arg="xls,' + o.id + '">Excel</button><button type="button" class="cy" style="height:48px;border-radius:16px;font-weight:700;font-size:14px" data-a="fin" data-arg="' + o.id + '">Financiar</button></div></section>').join('')
+    + '</div>' + nav('proy') + '</div>';
+}
+const FSTEPS = ['Monto y plazo', 'Tus datos y tu obra', 'Documentos', 'Estado de tu solicitud'];
+const DOCS = [['ine1', 'INE por el frente', 'M3 6h18v12H3zM7 10h4v4H7zM14 10h4M14 14h3'], ['ine2', 'INE por atrás', 'M3 6h18v12H3zM6 10h12M6 14h8'], ['comp', 'Comprobante de domicilio', 'M6 3h9l4 4v14H6zM9 11h7M9 15h7']];
+function vFin() {
+  const f = S.fin, m = Math.max(0, parseFloat(f.monto) || 0), costo = m * CFG.tasa / 100 * f.dias / 30, n = f.dias / 15;
+  let body = '', foot = '';
+  if (f.step === 1) {
+    const over = m > disponible() + 0.005;
+    body = '<div class="col g6"><label for="monto" class="lbl">¿Cuánto necesitas?</label><div class="inp' + (f.err.monto || over ? ' bad' : '') + '" style="display:flex;align-items:center;height:68px;border-radius:20px;gap:6px;padding:0 18px"><span style="font-size:28px;font-weight:700;color:#5A6379">$</span><input id="monto" type="number" inputmode="decimal" step="100" value="' + esc(f.monto) + '" data-f="fin.monto" style="flex:1;min-width:0;height:56px;border:0;background:transparent;font:700 28px Lexend,sans-serif"></div>'
+      + (over ? '<div class="err" role="alert">Tu línea disponible es de ' + money(disponible()) + '. Con este monto la solicitud no pasa.</div>' : f.err.monto ? '<div class="err" role="alert">Escribe un monto mayor a cero.</div>' : '<div class="sm">Es el costo de ' + esc(f.src.de) + '. Puedes cambiarlo.</div>') + '</div>'
+      + '<div class="col g6"><div class="lbl">¿En cuánto tiempo lo pagas?</div><div class="grid" style="grid-template-columns:repeat(4,minmax(0,1fr))">' + [30, 60, 90, 180].map((d) => '<button type="button" class="pill" data-a="plazo" data-arg="' + d + '" aria-pressed="' + (f.dias === d) + '" style="height:64px;font-weight:700;font-size:20px;display:flex;flex-direction:column;align-items:center;justify-content:center">' + d + '<span style="font-size:12px;font-weight:500">días</span></button>').join('') + '</div></div>'
+      + '<div class="dark col g12"><div class="col g2"><div class="k">' + n + ' pagos, uno cada 15 días</div><div class="big">' + money((m + costo) / n) + '</div></div><div class="sb" style="font-size:15px"><span style="color:#C9D1E0">Material</span><span>' + money(m) + '</span></div><div class="sb" style="font-size:15px"><span style="color:#C9D1E0">Costo del crédito</span><span>' + money(costo) + '</span></div><div class="sb" style="font-size:16px;font-weight:700;border-top:1px solid #3A4563;padding-top:12px"><span>Total a pagar</span><span>' + money(m + costo) + '</span></div></div>'
+      + '<div class="sm">Ejemplo con tasa de ' + CFG.tasa + '% mensual. La tasa final se confirma al aprobar tu solicitud.</div>';
+  } else if (f.step === 2) {
+    const fld = (k, l, ph, ac) => '<div class="col g6"><label for="x' + k + '" class="lbl">' + l + '</label><input id="x' + k + '" type="text"' + (ac ? ' autocomplete="' + ac + '"' : '') + ' placeholder="' + ph + '" value="' + esc(f.form[k]) + '" data-f="fin.form.' + k + '" class="inp' + (f.err[k] ? ' bad' : '') + '">' + (f.err[k] ? '<div class="err" role="alert">' + f.err[k] + '</div>' : '') + '</div>';
+    body = '<div class="sb"><h2 style="font-size:18px;font-weight:700">Tus datos</h2><button type="button" data-a="autofill" style="font-size:14px;font-weight:600;text-decoration:underline;min-height:44px">Usar datos de ejemplo</button></div>' + fld('nom', 'Nombre completo', 'Como aparece en tu INE', 'name') + fld('curp', 'CURP', '18 letras y números') + '<h2 style="margin-top:8px;font-size:18px;font-weight:700">Tu obra</h2>' + fld('dir', '¿Dónde entregamos el material?', 'Calle, número y colonia', 'street-address') + fld('ref', 'Referencias para llegar', 'Ej. portón negro, frente a la tienda');
+  } else if (f.step === 3) {
+    body = '<p style="font-size:16px;line-height:1.4;color:#5A6379">Toma una foto de cada documento. Que se lea bien y sin reflejos.</p>' + DOCS.map((d) => { const st = f.docs[d[0]]; return '<button type="button" data-a="docFoto" data-arg="' + d[0] + '" class="card" style="display:flex;align-items:center;gap:14px;text-align:left;min-height:84px;border-radius:22px;padding:14px 16px;width:100%"><span style="width:52px;height:52px;border-radius:16px;background:' + (st === 2 ? '#41D5FB' : '#E3E8F2') + ';display:flex;align-items:center;justify-content:center;flex:none"' + (st === 1 ? ' class="pulse"' : '') + '><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#222B45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + (st === 2 ? 'M5 12.5l4.5 4.5L19 7.5' : d[2]) + '"></path></svg></span><span class="col g2" style="flex:1"><span style="font-size:17px;font-weight:600">' + d[1] + '</span><span style="font-size:14px;color:#5A6379">' + (st === 2 ? 'Listo. Toca para cambiar la foto.' : st === 1 ? 'Revisando que se lea bien…' : 'Toca para tomar la foto') + '</span></span></button>'; }).join('') + (f.err.docs ? '<div class="err" role="alert">Faltan documentos. Necesitamos los tres para enviar tu solicitud.</div>' : '');
+  } else {
+    const sol = S.sols.find((s) => s.id === f.solId) || { st: 'En revisión', folio: '—' };
+    const ST = { 'En revisión': ['En revisión', 'Estamos revisando tu solicitud', 'Te avisamos por SMS y WhatsApp en cuanto haya respuesta. No tienes que hacer nada más.', '#222B45', '#fff'], 'Aprobada': ['Aprobada', 'Tu crédito está aprobado', 'Ya estamos programando la entrega del material en tu obra.', '#41D5FB', '#222B45'], 'Rechazada': ['No aprobada', 'Por ahora no pudimos aprobarla', sol.why || 'Puedes intentar con un monto menor o volver a enviar tus documentos.', '#FB4A46', '#222B45'] }[sol.st];
+    body = '<div style="background:' + ST[3] + ';color:' + ST[4] + ';border-radius:24px;padding:22px 20px;display:flex;flex-direction:column;gap:8px"><div style="font-size:13px;font-weight:600;letter-spacing:1px;text-transform:uppercase">' + ST[0] + '</div><div style="font-size:26px;font-weight:700;line-height:1.15">' + ST[1] + '</div><div style="font-size:16px;line-height:1.4">' + ST[2] + '</div></div>'
+      + '<div class="card col" style="gap:10px"><div class="sb" style="font-size:15px"><span style="color:#5A6379">Solicitud</span><span style="font-weight:600">' + sol.folio + '</span></div><div class="sb" style="font-size:15px"><span style="color:#5A6379">Monto</span><span style="font-weight:600">' + money(m) + '</span></div><div class="sb" style="font-size:15px"><span style="color:#5A6379">Plazo</span><span style="font-weight:600">' + f.dias + ' días · ' + n + ' pagos</span></div></div>'
+      + (sol.st === 'En revisión' && !S.auto ? '<div class="sm">En esta demo, la respuesta se da desde el Panel de operación, en la pestaña Solicitudes.</div>' : '');
+    foot = sol.st === 'Rechazada' ? '<button type="button" class="btn pl" data-a="finRetry" style="font-size:17px;font-weight:600">Cambiar monto</button><button type="button" class="btn nv f" data-a="tab" data-arg="cred">Ir a Mi crédito</button>' : '<button type="button" class="btn nv f" data-a="tab" data-arg="cred">Ir a Mi crédito</button>';
+  }
+  if (f.step < 4) foot = (f.step > 1 ? '<button type="button" class="btn pl" data-a="finBack" style="font-size:17px;font-weight:600;padding:0 20px">Atrás</button>' : '') + '<button type="button" class="btn cy f" data-a="finNext"' + (f.sending ? ' disabled' : '') + '>' + (f.sending ? 'Enviando…' : f.step === 3 ? 'Enviar solicitud' : 'Continuar') + '</button>';
+  return '<div class="scr" data-k="fin"><div class="main" id="finMain"><div class="hd"><button type="button" class="bk" data-a="finExit" aria-label="Volver">' + BACK + '</button><div class="col"><h1 class="h1" style="font-size:24px">Financia tu material</h1><div class="sub">Paso ' + f.step + ' de 4 · ' + FSTEPS[f.step - 1] + '</div></div></div>'
+    + '<div class="grid" style="grid-template-columns:repeat(4,minmax(0,1fr));gap:6px" aria-hidden="true">' + [1, 2, 3, 4].map((i) => '<div style="height:6px;border-radius:3px;background:' + (i <= f.step ? '#222B45' : '#C9D1E0') + '"></div>').join('') + '</div>'
+    + '<div class="col" style="gap:' + (f.step === 3 ? 12 : 14) + 'px">' + body + '</div></div><div class="foot">' + foot + '</div></div>';
+}
+function vErr() {
+  return '<div class="scr" data-k="err"><div class="main"><button type="button" class="bk" data-a="go" data-arg="fin" aria-label="Volver">' + BACK + '</button><div role="alert" class="col g14" style="flex:1;align-items:center;justify-content:center;text-align:center;padding:0 12px"><div style="width:96px;height:96px;border-radius:32px;background:#FB4A46;display:flex;align-items:center;justify-content:center"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#222B45" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 6v8M12 18h.01"></path></svg></div><h1 style="font-size:26px;line-height:1.15;font-weight:700">No pudimos enviar tu solicitud</h1><p style="font-size:16px;line-height:1.4;color:#5A6379">Parece que se fue la señal. Tus datos y tus fotos siguen guardados en tu celular: no tienes que volver a capturar nada.</p></div>'
+    + '<div class="col g8"><button type="button" class="btn nv" style="height:62px" data-a="finSend"' + (S.fin.sending ? ' disabled' : '') + '>' + (S.fin.sending ? 'Enviando…' : 'Intentar de nuevo') + '</button><button type="button" class="btn pl" style="height:56px;font-size:16px;font-weight:600" data-a="finLater">Enviar después y seguir calculando</button></div></div></div>';
+}
+const ENVCOL = { 'Programado': ['#E3E8F2', '#222B45', 1], 'En camino': ['#222B45', '#fff', 2], 'Entregado': ['#41D5FB', '#222B45', 3], 'Con retraso': ['#FB4A46', '#222B45', 1] };
+function envTxt(e) {
+  const dd = dayDiff(e.date), cuando = dd === 0 ? 'hoy' : dd === 1 ? 'mañana, ' + dLong(e.date) : 'el ' + dLong(e.date);
+  if (e.st === 'Entregado') return 'Ya está en tu obra.';
+  if (e.st === 'Con retraso') return 'Va con retraso. Te avisamos la nueva hora.';
+  if (e.st === 'En camino') return 'Llega ' + cuando + (e.win ? ', de ' + e.win : '') + '.';
+  return cap(dLong(e.date)) + '. Te avisamos cuando salga.';
+}
+function vCred() {
+  const pen = pendientes(), saldo = r2(pen.reduce((s, x) => s + x.p.amt, 0)), us = usado(), pct = Math.round(us / CFG.linea * 100), mine = S.envios.filter((e) => e.mine), sol = mySol();
+  return '<div class="scr" data-k="cred"><div class="main" style="padding:28px 20px 24px"><h1 style="font-size:30px;font-weight:700">Mi crédito</h1>'
+    + '<div class="dark col" style="gap:10px"><div class="col g2"><div class="k">Línea disponible</div><div class="big">' + money(CFG.linea - us) + '</div></div><div style="height:10px;border-radius:5px;background:#3A4563;overflow:hidden" role="img" aria-label="Has usado ' + pct + '% de tu línea"><div style="width:' + pct + '%;height:100%;background:#41D5FB;border-radius:5px;transition:width .3s"></div></div><div class="sb" style="font-size:14px;color:#C9D1E0"><span>Usado: ' + money(us) + '</span><span>Línea: ' + money(CFG.linea) + '</span></div><div class="sb" style="font-size:16px;font-weight:600;border-top:1px solid #3A4563;padding-top:10px"><span>Saldo por pagar</span><span>' + money(saldo) + '</span></div></div>'
+    + (sol ? '<button type="button" class="card sb" data-a="verSol" data-arg="' + sol.id + '" style="text-align:left;width:100%"><span class="col g2"><span style="font-size:16px;font-weight:600">Solicitud ' + sol.folio + '</span><span style="font-size:14px;color:#5A6379">' + money(sol.monto) + ' · ' + sol.dias + ' días</span></span><span class="tagp nv">En revisión</span></button>' : '')
+    + (pen.length ? '<div class="cy sb" style="border-radius:24px;padding:16px 18px"><div class="col g2"><div style="font-size:14px;font-weight:500">Próximo pago · ' + dLong(pen[0].p.date) + '</div><div style="font-size:26px;font-weight:700">' + money(pen[0].p.amt) + '</div></div><button type="button" class="nv" data-a="pay" style="height:52px;padding:0 22px;border-radius:18px;font-weight:700;font-size:16px">Pagar</button></div>'
+      : '<div class="card col g12"><div class="col g4"><h2 style="font-size:18px;font-weight:700">' + (S.creds.length ? 'Estás al corriente' : 'Tu línea está lista') + '</h2><p style="font-size:15px;line-height:1.4;color:#5A6379">' + (S.creds.length ? 'No tienes pagos pendientes.' : 'Calcula tu material y fináncialo: lo recibes en obra y lo pagas cada 15 días.') + '</p></div><button type="button" class="btn cy" style="height:54px;font-size:16px" data-a="go" data-arg="inicio">Calcular material</button></div>')
+    + (mine.length ? '<section class="card col g14"><h2 style="font-size:18px;font-weight:700">Entrega en tu obra</h2>' + mine.map((e, i) => { const c = ENVCOL[e.st]; return '<div class="col g8"' + (i ? ' style="border-top:1px solid #EEF1F7;padding-top:14px"' : '') + '><div class="sb" style="gap:8px"><div style="font-size:16px;font-weight:600">' + esc(e.mat) + '</div><div class="tagp" style="background:' + c[0] + ';color:' + c[1] + '">' + e.st + '</div></div><div class="grid" style="grid-template-columns:repeat(3,minmax(0,1fr));gap:6px" aria-hidden="true">' + [1, 2, 3].map((k) => '<div style="height:8px;border-radius:4px;background:' + (k <= c[2] ? '#222B45' : '#E3E8F2') + '"></div>').join('') + '</div><div class="grid" style="grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;font-size:12px;color:#5A6379"><div>Pedido</div><div>En camino</div><div>En obra</div></div><div style="font-size:14px;color:#5A6379">' + esc(e.obra) + ' · ' + envTxt(e) + '</div></div>'; }).join('') + '</section>' : '')
+    + (pen.length > 1 ? '<section class="card col g4"><h2 style="margin-bottom:4px;font-size:18px;font-weight:700">Siguientes pagos</h2>' + pen.slice(1, 4).map((x) => '<div class="rowl" style="min-height:44px"><span>' + cap(dLong(x.p.date)) + '</span><span style="font-weight:600">' + money(x.p.amt) + '</span></div>').join('') + '</section>' : '')
+    + '<section class="card col g4"><h2 style="margin-bottom:4px;font-size:18px;font-weight:700">Historial</h2>' + S.hist.map((h) => '<div class="rowl"><span class="col"><span style="font-size:16px">' + esc(h.t) + '</span><span style="font-size:13px;color:#5A6379">' + esc(h.sub) + '</span></span><span style="font-size:16px;font-weight:600;white-space:nowrap">' + money(h.amt) + '</span></div>').join('') + '</section>'
+    + '</div>' + nav('cred') + '</div>';
+}
+function vCuenta() {
+  const u = S.user, nC = S.obras.reduce((s, o) => s + o.calcs.length, 0);
+  const row = (a, t, d) => '<button type="button" class="rowl" data-a="' + a + '" style="min-height:60px"><span class="col"><span style="font-size:16px;font-weight:600">' + t + '</span><span style="font-size:13px;color:#5A6379">' + d + '</span></span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg></button>';
+  return '<div class="scr" data-k="cuenta"><div class="main" style="padding:28px 20px 24px"><h1 style="font-size:30px;font-weight:700">Mi cuenta</h1>'
+    + '<div class="dark" style="display:flex;align-items:center;gap:14px"><div style="width:60px;height:60px;border-radius:20px;background:#41D5FB;color:#222B45;display:flex;align-items:center;justify-content:center;flex:none"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg></div><div class="col g2" style="min-width:0"><div style="font-size:20px;font-weight:700">' + esc(u.nombre || 'Tu cuenta BIIN') + '</div><div class="k">' + esc(u.email || '+52 ' + u.cel) + (u.rol && u.rol !== 'cliente' ? ' · ' + (u.rol === 'super_admin' ? 'Super administrador' : 'Operación') : '') + '</div></div></div>'
+    + '<div class="grid" style="grid-template-columns:repeat(3,minmax(0,1fr))">' + [[S.obras.length, 'Obras'], [nC, 'Cálculos'], [S.creds.length, 'Créditos']].map((x) => '<div class="card" style="border-radius:20px;padding:14px"><div style="font-size:26px;font-weight:700">' + x[0] + '</div><div style="font-size:13px;color:#5A6379">' + x[1] + '</div></div>').join('') + '</div>'
+    + '<div class="card col" style="padding:6px 16px">' + row('goCred', 'Mi crédito', 'Línea disponible: ' + money(disponible())) + row('installAsk', 'Instalar BIIN en tu celular', 'Abre más rápido y funciona sin internet') + '</div>'
+    + '<button type="button" class="btn pl" style="height:56px;font-size:16px;font-weight:600" data-a="logout">Cerrar sesión</button></div>' + nav('cuenta') + '</div>';
+}
+
+/* ============ hojas (modales) ============ */
+function docData(src) {
+  if (src === 'calc') { const r = cur(); return { title: r.title, sub: r.sub, rows: r.rows, total: r.total, note: r.T.note }; }
+  const o = S.obras.find((x) => x.id === src);
+  return { title: o.name, sub: o.city + ' · ' + o.calcs.length + (o.calcs.length === 1 ? ' cálculo' : ' cálculos'), rows: obraRows(o), total: obraTotal(o), note: 'No incluye mano de obra.' };
+}
+function docText(d, tsv) {
+  if (tsv) return ['Material\tPara qué\tCantidad\tUnidad\tPrecio\tImporte'].concat(d.rows.map((r) => [r.n, r.use, r.qty, r.u, r.price, r.cost].join('\t')), ['Total estimado\t\t\t\t\t' + d.total]).join('\n');
+  return 'BIIN · Cotización de materiales\n' + d.title + ' (' + d.sub + ')\n' + cap(dLong(T0)) + '\n\n' + d.rows.map((r) => '• ' + r.n + ': ' + qU(r.qty, r.u) + ' — ' + money(r.cost)).join('\n') + '\n\nTotal estimado: ' + money(d.total) + '\nPrecios estimados con entrega en obra. ' + d.note;
+}
+function sheetHTML() {
+  const s = S.sheet;
+  if (!s) return '';
+  let h = '';
+  if (s.k === 'save') {
+    h = '<h2>Guardar en una obra</h2><div class="col g6"><label for="slabel" class="lbl">Nombre del cálculo</label><input id="slabel" class="inp" type="text" value="' + esc(s.label) + '" data-f="sheet.label"></div><div class="col g8"><div class="lbl">¿En qué obra?</div>'
+      + S.obras.map((o) => '<button type="button" class="radio" data-a="saveObra" data-arg="' + o.id + '" aria-pressed="' + (s.obra === o.id) + '">' + esc(o.name) + '</button>').join('')
+      + '<button type="button" class="radio" data-a="saveObra" data-arg="new" aria-pressed="' + (s.obra === 'new') + '">Obra nueva</button>'
+      + (s.obra === 'new' ? '<input id="sname" class="inp' + (s.err ? ' bad' : '') + '" type="text" placeholder="Ej. Casa de mi mamá" value="' + esc(s.name) + '" data-f="sheet.name" data-enter="saveOk">' + (s.err ? '<div class="err" role="alert">Ponle nombre a la obra.</div>' : '') : '') + '</div>'
+      + '<div style="display:flex;gap:10px"><button type="button" class="btn pl" style="font-size:17px;font-weight:600" data-a="close">Cancelar</button><button type="button" class="btn cy f" data-a="saveOk">Guardar</button></div>';
+  } else if (s.k === 'doc') {
+    const d = docData(s.src), x = s.mode === 'xls';
+    h = '<h2>' + (x ? 'Tabla para Excel' : 'Cotización de materiales') + '</h2><div class="paper"><div class="sb"><div style="display:flex;align-items:center;gap:8px;font-weight:700;letter-spacing:1px;font-size:16px"><span class="lgi" style="width:30px;height:30px;border-radius:10px">' + LOGO(18) + '</span>BIIN</div><div style="color:#5A6379">' + cap(dLong(T0)) + '</div></div><div><div style="font-size:16px;font-weight:700">' + esc(d.title) + '</div><div style="color:#5A6379">' + esc(d.sub) + '</div></div>'
+      + '<table><thead><tr><th>Material</th><th class="r">Cantidad</th>' + (x ? '<th class="r">Precio</th>' : '') + '<th class="r">Importe</th></tr></thead><tbody>' + d.rows.map((r) => '<tr><td>' + esc(r.n) + '</td><td class="r">' + qU(r.qty, r.u) + '</td>' + (x ? '<td class="r">' + money(r.price) + '</td>' : '') + '<td class="r">' + money(r.cost) + '</td></tr>').join('') + '</tbody></table>'
+      + '<div class="sb" style="font-size:16px;font-weight:700"><span>Total estimado</span><span>' + money(d.total) + '</span></div><div style="color:#5A6379;line-height:1.4">Precios estimados con entrega en obra. ' + d.note + '</div></div>'
+      + '<div class="sm">' + (x ? 'Copia la tabla y pégala en Excel o Google Sheets: cada dato cae en su celda.' : 'En esta demo la cotización se copia como texto. La descarga en PDF se conecta al publicar la app.') + '</div>'
+      + '<div style="display:flex;gap:10px"><button type="button" class="btn pl" style="font-size:17px;font-weight:600" data-a="close">Cerrar</button><button type="button" class="btn cy f" data-a="copy">' + (s.done ? 'Copiado' : x ? 'Copiar tabla' : 'Copiar cotización') + '</button></div>'
+      + (s.manual ? '<textarea readonly style="width:100%;height:110px;border:0;border-radius:14px;padding:10px;font:12px ui-monospace,monospace" aria-label="Texto para copiar">' + esc(docText(d, x)) + '</textarea>' : '');
+  } else if (s.k === 'pay') {
+    const x = pendientes()[0];
+    h = '<h2>Pagar ' + money(x.p.amt) + '</h2><div class="card col" style="gap:10px"><div class="sb" style="font-size:15px"><span style="color:#5A6379">Crédito</span><span style="font-weight:600">' + x.c.folio + '</span></div><div class="sb" style="font-size:15px"><span style="color:#5A6379">Vence</span><span style="font-weight:600">' + cap(dLong(x.p.date)) + '</span></div><div class="sb" style="font-size:15px"><span style="color:#5A6379">Pago</span><span style="font-weight:600">' + (x.c.pagos.indexOf(x.p) + 1) + ' de ' + x.c.pagos.length + '</span></div></div>'
+      + '<div class="col g8"><div class="lbl">¿Cómo pagas?</div>' + [['spei', 'Transferencia SPEI'], ['tarjeta', 'Tarjeta de débito'], ['tienda', 'Efectivo en tienda']].map((m) => '<button type="button" class="radio" data-a="payMode" data-arg="' + m[0] + '" aria-pressed="' + (s.mode === m[0]) + '">' + m[1] + '</button>').join('') + '</div>'
+      + '<div class="sm">Pago simulado: en esta demo no se mueve dinero.</div><div style="display:flex;gap:10px"><button type="button" class="btn pl" style="font-size:17px;font-weight:600" data-a="close">Cancelar</button><button type="button" class="btn cy f" data-a="payOk">Confirmar pago</button></div>';
+  } else if (s.k === 'install') {
+    h = installCard();
+  }
+  return '<div class="veil' + (S.view === 'phone' ? '' : ' fx') + '" data-k="veil-' + s.k + '" data-a="veil"><div class="sheet" role="dialog" aria-modal="true">' + h + '</div></div>';
+}
+
+/* ============ escritorio ============ */
+function vDesk() {
+  const T = TYPES[S.calc.type], p = S.calc.p, r = cur();
+  const cols = 'grid-template-columns:2.2fr 1.5fr 1fr 1fr 1fr';
+  return '<div class="wide" data-k="desk"><div class="in"><header class="top"><div class="lg"><div class="lgi">' + LOGO(24) + '</div>BIIN</div><div class="tabs">' + Object.keys(NAVI).map((k) => '<button type="button" data-a="deskTab" data-arg="' + k + '"' + (k === 'inicio' ? ' aria-current="page"' : '') + '>' + NAVI[k][0] + '</button>').join('') + '</div></header>'
+    + '<div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start"><section class="panel col" style="flex:1 1 340px;min-width:0;padding:24px;gap:18px">'
+    + '<div class="types" role="group" aria-label="Tipo de obra">' + ORDER.filter((k) => TYPES[k].on).map((k) => '<button type="button" data-a="pickDesk" data-arg="' + k + '" aria-pressed="' + (k === S.calc.type) + '">' + esc(TYPES[k].t) + '</button>').join('') + '</div>'
+    + '<div class="col g4"><h1 style="font-size:28px;font-weight:700">' + esc(T.t) + '</h1><div style="font-size:15px;color:#5A6379">Cambia las medidas y la lista se actualiza sola.</div></div>'
+    + '<div class="grid" style="grid-template-columns:repeat(' + Math.min(2, T.f.length) + ',minmax(0,1fr));gap:12px">' + T.f.map((f) => '<div class="col g6"><label for="d' + f[0] + '" style="font-size:14px;font-weight:600">' + esc(f[1]) + '</label><input id="d' + f[0] + '" class="dinp" type="number" step="' + f[4] + '" value="' + fmt(p[f[0]]) + '" data-num="' + f[0] + '"></div>').join('') + '</div>'
+    + optsHTML(T, p, 'dpill').replace(/class="lbl"/g, 'style="font-size:14px;font-weight:600"')
+    + '<div class="col g6"><div style="display:flex;justify-content:space-between;align-items:baseline"><label for="dW" style="font-size:14px;font-weight:600">Desperdicio</label><span style="font-size:18px;font-weight:700">' + p.w + '%</span></div><input id="dW" type="range" min="0" max="15" step="1" value="' + p.w + '" data-range="w" style="height:28px"></div>'
+    + '<div class="nv col g2" style="border-radius:22px;padding:18px 20px"><div style="font-size:14px;color:#C9D1E0">Costo estimado de material</div><div class="big">' + money(r.total) + '</div><div style="font-size:14px;color:#C9D1E0">' + r.chip + ' · ' + r.lead + '</div></div>'
+    + '<button type="button" class="btn cy" style="height:58px;border-radius:18px;font-size:17px" data-a="fin" data-arg="calc">Financia estos materiales</button></section>'
+    + '<div class="col" style="flex:999 1 560px;min-width:0;gap:20px"><section class="panel col g8"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;font-size:15px;font-weight:600"><span>' + r.eq.map((e, i) => (i ? ' ' + eqSep(e) + ' ' : '') + e).join('') + '</span><span style="color:#5A6379;font-weight:500">' + r.extra + '</span></div><svg viewBox="0 0 700 220" style="width:100%;height:auto" role="img" aria-label="Dibujo con tus medidas">' + r.draw(700, 220, true) + '</svg></section>'
+    + '<section class="panel col g12"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px"><h2 style="font-size:22px;font-weight:700">Lista de materiales</h2><div style="display:flex;flex-wrap:wrap;gap:8px"><button type="button" class="sbtn" data-a="save">' + (S.saved ? 'Guardado' : S.editing ? 'Actualizar' : 'Guardar') + '</button><a class="sbtn" target="_blank" rel="noopener" href="https://wa.me/?text=' + encodeURIComponent(r.text) + '">WhatsApp</a><button type="button" class="sbtn" data-a="doc" data-arg="pdf,calc">PDF</button><button type="button" class="sbtn" data-a="doc" data-arg="xls,calc">Excel</button></div></div>'
+    + (S.msg ? '<div role="status" class="status">' + esc(S.msg) + '</div>' : '')
+    + '<div class="tb"><div style="min-width:640px" role="table" aria-label="Materiales"><div role="row" class="tr th" style="' + cols + '"><div role="columnheader">Material</div><div role="columnheader">Para qué</div><div role="columnheader" class="r">Cantidad</div><div role="columnheader" class="r">Precio</div><div role="columnheader" class="r">Importe</div></div>'
+    + r.rows.map((it) => '<div role="row" class="tr" style="' + cols + '"><div role="cell" style="font-weight:600">' + esc(it.n) + '</div><div role="cell" style="color:#5A6379">' + it.use + '</div><div role="cell" class="r" style="font-weight:700">' + qU(it.qty, it.u) + '</div><div role="cell" class="r">' + money(it.price) + '</div><div role="cell" class="r" style="font-weight:600">' + money(it.cost) + '</div></div>').join('')
+    + '<div role="row" class="tr" style="' + cols + ';padding:14px 0 4px;font-size:18px;font-weight:700;border:0"><div role="cell">Total estimado</div><div></div><div></div><div></div><div role="cell" class="r">' + money(r.total) + '</div></div></div></div>'
+    + '<div class="sm">Precios estimados con entrega en obra. ' + esc(T.note) + '</div></section></div></div></div></div>';
+}
+
+/* ============ panel de operación ============ */
+function vOps() {
+  const tab = S.ops.tab;
+  let body = '';
+  if (tab === 'sol') {
+    const ok = S.sols.filter((s) => s.st === 'Aprobada'), col = r2(ok.reduce((s, x) => s + x.monto, 0)), rev = S.sols.filter((s) => s.st === 'En revisión').length;
+    const cols = 'grid-template-columns:1.2fr 1.6fr 1.5fr 1fr .8fr 1fr 1.7fr';
+    const C = { 'En revisión': ['#222B45', '#fff'], 'Aprobada': ['#41D5FB', '#222B45'], 'Rechazada': ['#FB4A46', '#222B45'] };
+    body = '<div class="col g4"><h1 style="font-size:30px;font-weight:700">Solicitudes de crédito</h1><p style="font-size:16px;color:#5A6379;max-width:760px">Lo que el cliente envía desde su app llega aquí. Al aprobar, se abre su crédito, se aparta el material con el proveedor y se programan los envíos.</p></div>'
+      + '<div class="kpis"><div class="kpi nv"><div class="k">Crédito colocado</div><div class="v">' + money(col) + '</div></div><div class="kpi"><div class="k">Solicitudes en revisión</div><div class="v">' + rev + '</div></div><div class="kpi cy"><div class="k">Margen estimado al ' + CFG.margen + '% actual</div><div class="v">' + money(col * CFG.margen / (100 + CFG.margen)) + '</div></div></div>'
+      + '<section class="panel"><div class="tb"><div style="min-width:900px" role="table" aria-label="Solicitudes"><div role="row" class="tr th" style="' + cols + '"><div>Folio</div><div>Cliente</div><div>Obra</div><div class="r">Monto</div><div class="r">Plazo</div><div>Estado</div><div></div></div>'
+      + S.sols.map((s) => '<div role="row" class="tr" style="' + cols + '"><div style="font-weight:600">' + s.folio + '</div><div>' + esc(s.cliente) + '</div><div>' + esc(s.obra) + '</div><div class="r" style="font-weight:700">' + money(s.monto) + '</div><div class="r">' + s.dias + ' días</div><div><span class="tagp" style="background:' + C[s.st][0] + ';color:' + C[s.st][1] + '">' + s.st + '</span></div><div style="display:flex;gap:6px;flex-wrap:wrap">' + (s.st === 'En revisión' ? '<button type="button" class="sbtn cy" data-a="solOk" data-arg="' + s.id + '">Aprobar</button><button type="button" class="sbtn" data-a="solNo" data-arg="' + s.id + '">Rechazar</button>' : '') + '</div></div>').join('')
+      + '</div></div></section>';
+  } else if (tab === 'inv') {
+    const rows = S.inv.map((r, i) => { const libre = r.disp - r.apart; return Object.assign({ i: i, libre: libre, low: libre < r.aviso }, r); });
+    const cols = 'grid-template-columns:2.2fr 1fr 1fr 1fr 1fr 1.1fr 1.1fr';
+    body = '<div class="col g4"><h1 style="font-size:30px;font-weight:700">Inventario con proveedores</h1><p style="font-size:16px;color:#5A6379;max-width:760px">No tienes bodega. Aquí ves lo que tus proveedores tienen disponible para BIIN y lo que ya está apartado para pedidos de clientes.</p></div>'
+      + '<div class="kpis"><div class="kpi nv"><div class="k">Materiales en catálogo</div><div class="v">' + rows.length + '</div></div><div class="kpi"><div class="k">Pedidos abiertos</div><div class="v">' + S.envios.filter((e) => e.st !== 'Entregado').length + '</div></div><div class="kpi rd"><div class="k">Hay que pedir más</div><div class="v">' + rows.filter((r) => r.low).length + '</div></div></div>'
+      + '<section class="panel"><div class="tb"><div style="min-width:860px" role="table" aria-label="Inventario"><div role="row" class="tr th" style="' + cols + '"><div>Material</div><div class="r">Disponible</div><div class="r">Apartado</div><div class="r">Libre</div><div class="r">Aviso en</div><div>Estado</div><div></div></div>'
+      + rows.map((r) => '<div role="row" class="tr" style="' + cols + '"><div style="font-weight:600">' + esc(CAT[r.key].n) + '</div><div class="r">' + num(r.disp) + ' ' + CAT[r.key].u + '</div><div class="r">' + num(r.apart) + '</div><div class="r" style="font-weight:700">' + num(r.libre) + '</div><div class="r" style="color:#5A6379">' + num(r.aviso) + '</div><div><span class="tagp" style="background:' + (r.low ? '#FB4A46' : '#E3E8F2') + '">' + (r.low ? 'Pedir más' : 'Suficiente') + '</span></div><div>' + (r.low ? '<button type="button" class="sbtn" data-a="invOrder" data-arg="' + r.i + '">Pedir a proveedor</button>' : '') + '</div></div>').join('')
+      + '</div></div></section>';
+  } else if (tab === 'pre') {
+    const r = cur();
+    let cT = 0;
+    const rows = r.rows.map((x) => { const c = CAT[x.key].c; cT += x.qty * c; return { n: x.n, qty: qU(x.qty, x.u), costo: money(c), precio: money(x.price), util: money(x.qty * (x.price - c)) }; });
+    const cols = 'grid-template-columns:2.2fr 1fr 1.2fr 1.2fr 1.2fr';
+    body = '<div class="col g4"><h1 style="font-size:30px;font-weight:700">Simulador de precios</h1><p style="font-size:16px;color:#5A6379;max-width:760px">Mueve tu margen sobre el precio preferente y ve cuánto paga el cliente y cuánto ganas en el cálculo que tiene abierto en su app: ' + esc(r.title.toLowerCase()) + '. El cambio se refleja al instante en la app del cliente.</p></div>'
+      + '<div class="kpis"><div class="kpi col g8"><div style="display:flex;justify-content:space-between;align-items:baseline"><label for="mg" class="k">Tu margen</label><span style="font-size:30px;font-weight:700">' + CFG.margen + '%</span></div><input id="mg" type="range" min="0" max="30" step="1" value="' + CFG.margen + '" data-range="margen" style="height:28px"></div><div class="kpi"><div class="k">Tu costo con proveedores</div><div class="v">' + money(cT) + '</div></div><div class="kpi nv"><div class="k">Paga el cliente</div><div class="v">' + money(r.total) + '</div></div><div class="kpi cy"><div class="k">Tu ganancia en este pedido</div><div class="v">' + money(r.total - cT) + '</div></div></div>'
+      + '<section class="panel"><div class="tb"><div style="min-width:760px" role="table" aria-label="Precios"><div role="row" class="tr th" style="' + cols + '"><div>Material</div><div class="r">Cantidad</div><div class="r">Precio preferente</div><div class="r">Precio al cliente</div><div class="r">Ganancia</div></div>'
+      + rows.map((x) => '<div role="row" class="tr" style="' + cols + '"><div style="font-weight:600">' + esc(x.n) + '</div><div class="r">' + x.qty + '</div><div class="r" style="color:#5A6379">' + x.costo + '</div><div class="r" style="font-weight:700">' + x.precio + '</div><div class="r" style="font-weight:600">' + x.util + '</div></div>').join('') + '</div></div></section>';
+  } else {
+    const NEXT = { 'Programado': 'En camino', 'En camino': 'Entregado', 'Con retraso': 'En camino' };
+    const cols = 'grid-template-columns:.9fr 1.5fr 1.8fr 1.1fr 1.3fr 1.1fr 1.3fr';
+    body = '<div class="col g4"><h1 style="font-size:30px;font-weight:700">Envíos a obra</h1><p style="font-size:16px;color:#5A6379;max-width:760px">Cada pedido sale directo del proveedor a la obra del cliente. El cliente ve el mismo estado en su app.</p></div>'
+      + '<section class="panel"><div class="tb"><div style="min-width:880px" role="table" aria-label="Envíos"><div role="row" class="tr th" style="' + cols + '"><div>Envío</div><div>Obra</div><div>Material</div><div>Sale de</div><div>Entrega</div><div>Estado</div><div></div></div>'
+      + S.envios.map((e, i) => { const c = ENVCOL[e.st]; return '<div role="row" class="tr" style="' + cols + '"><div style="font-weight:600">' + e.id + '</div><div>' + esc(e.obra) + '</div><div>' + esc(e.mat) + '</div><div style="color:#5A6379">' + e.prov + '</div><div>' + dOps(e.date) + (e.win ? ', ' + e.win : '') + '</div><div><span class="tagp" style="background:' + c[0] + ';color:' + c[1] + '">' + e.st + '</span></div><div>' + (NEXT[e.st] ? '<button type="button" class="sbtn" data-a="envNext" data-arg="' + i + '">' + (NEXT[e.st] === 'Entregado' ? 'Marcar entregado' : 'Marcar en camino') + '</button>' : '') + '</div></div>'; }).join('')
+      + '</div></div></section>';
+  }
+  const tabs = [['sol', 'Solicitudes'], ['inv', 'Inventario'], ['pre', 'Precios'], ['env', 'Envíos']];
+  return '<div class="wide" data-k="ops"><div class="in"><header class="top"><div class="lg"><div class="lgi">' + LOGO(24) + '</div>BIIN<span style="font-size:14px;font-weight:400;letter-spacing:0;color:#5A6379;margin-left:6px">Panel de operación</span></div><div class="tabs" role="tablist" aria-label="Secciones">' + tabs.map((t) => '<button type="button" role="tab" aria-selected="' + (tab === t[0]) + '" data-a="opsTab" data-arg="' + t[0] + '">' + t[1] + '</button>').join('') + '</div></header><div class="col" style="gap:20px" data-k="ops-' + tab + '">' + body + '</div></div></div>';
+}
+
+/* ============ panel de Super administrador ============ */
+const ai = (path, val, isNum, lab, pos) => '<input class="ai" type="' + (isNum ? 'number' : 'text') + '"' + (isNum ? ' step="any" data-t="num"' : '') + (pos ? ' data-pos="1"' : '') + ' value="' + esc(val) + '" data-f="' + path + '" data-r="1"' + (lab ? ' aria-label="' + esc(lab) + '"' : '') + '>';
+const asel = (path, val, opts, lab) => '<select class="ai" data-f="' + path + '" data-r="1" data-v="' + esc(val) + '"' + (lab ? ' aria-label="' + esc(lab) + '"' : '') + '>' + opts.map((o) => '<option value="' + esc(o[0]) + '"' + (o[0] === val ? ' selected' : '') + '>' + esc(o[1]) + '</option>').join('') + '</select>';
+const fl = (l, h, st) => '<label class="fl"' + (st ? ' style="' + st + '"' : '') + '><span>' + l + '</span>' + h + '</label>';
+function baseFams(k) {
+  const T = TYPES[k];
+  if (T.base === 'custom') return [];
+  const o = T.off, e = T.extra; let rows;
+  T.off = {}; T.extra = [];
+  try { rows = calc(k, defaults(k)).rows; } finally { T.off = o; T.extra = e; }
+  const seen = [];
+  rows.forEach((r) => { const f = fam(r.key); if (seen.indexOf(f) < 0) seen.push(f); });
+  return seen;
+}
+const matUsed = (k) => Object.keys(TYPES).some((t) => TYPES[t].extra.some((e) => e.mat === k));
+function vAdmin() {
+  const a = S.adm;
+  let body = '';
+  if (a.tab === 'cat') {
+    if (!TYPES[a.sel]) a.sel = ORDER[0];
+    const k = a.sel, T = TYPES[k], P = 'TYPES.' + k + '.', r = calc(k, defaults(k)), custom = T.base === 'custom', B = BASES[T.base];
+    const mats = Object.keys(CAT).map((m) => [m, CAT[m].n + ' (' + CAT[m].u + ')']);
+    const badF = T.f.some((f) => !(f[2] < f[3]) || !(f[4] > 0));
+    const list = '<section class="panel col g4" style="flex:1 1 300px;min-width:0;padding:14px"><div class="sb" style="padding:4px 6px 8px"><h2 class="h3">Categorías</h2><button type="button" class="sbtn cy" data-a="catNew">Nueva categoría</button></div>'
+      + ORDER.map((x, i) => '<div style="display:flex;align-items:center;gap:4px"><button type="button" class="acat" data-a="admSel" data-arg="' + x + '" aria-pressed="' + (x === k) + '"><svg width="34" height="34" viewBox="0 0 48 48" aria-hidden="true" style="flex:none">' + ICONS[TYPES[x].icon] + '</svg><span class="col" style="min-width:0"><span style="font-weight:600;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(TYPES[x].t) + '</span><span style="font-size:12px;color:#5A6379">' + (TYPES[x].on ? 'Activa' : 'Oculta') + (TYPES[x].base === 'custom' ? ' · creada por ti' : '') + '</span></span></button><button type="button" class="ib" data-a="catMove" data-arg="' + x + ',-1" aria-label="Subir ' + esc(TYPES[x].t) + '"' + (i === 0 ? ' disabled' : '') + '>↑</button><button type="button" class="ib" data-a="catMove" data-arg="' + x + ',1" aria-label="Bajar ' + esc(TYPES[x].t) + '"' + (i === ORDER.length - 1 ? ' disabled' : '') + '>↓</button></div>').join('') + '</section>';
+    const gen = '<section class="panel col g14"><div class="sb"><h2 class="h3">Datos generales</h2><div style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600">' + (T.on ? 'Visible en la app' : 'Oculta en la app') + '<button type="button" class="sw" role="switch" aria-checked="' + T.on + '" aria-label="Visible en la app" data-a="catOn"></button></div></div>'
+      + '<div class="agrid" style="grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));align-items:start">' + fl('Nombre', ai(P + 't', T.t)) + fl('Descripción corta (tarjeta de inicio)', ai(P + 'd', T.d)) + fl('Texto de ayuda (bajo el título)', ai(P + 'h', T.h)) + fl('Desperdicio normal (%)', ai(P + 'w', T.w, true)) + '</div>'
+      + fl('Nota al pie del resultado', ai(P + 'note', T.note))
+      + '<div class="fl"><span>Icono</span><div style="display:flex;flex-wrap:wrap;gap:8px">' + Object.keys(ICONS).map((ic) => '<button type="button" class="icp" data-a="catIcon" data-arg="' + ic + '" aria-pressed="' + (T.icon === ic) + '" aria-label="Icono ' + ic + '"><svg width="36" height="36" viewBox="0 0 48 48" aria-hidden="true">' + ICONS[ic] + '</svg></button>').join('') + '</div></div></section>';
+    const fcols = 'grid-template-columns:2fr 1fr 1fr 1fr 1fr';
+    const med = '<section class="panel col g12"><h2 class="h3">Medidas que captura el cliente</h2>'
+      + (custom ? '<div class="fl"><span>Forma de medir</span><div class="grid" style="grid-template-columns:repeat(3,minmax(0,1fr))">' + [['plan', 'Largo × ancho'], ['muro', 'Largo × alto'], ['lineal', 'Metros lineales']].map((x) => '<button type="button" class="dpill" data-a="catShape" data-arg="' + x[0] + '" aria-pressed="' + (T.shape === x[0]) + '">' + x[1] + '</button>').join('') + '</div></div>' : '')
+      + '<div class="tb"><div style="min-width:560px" class="col g8"><div class="agrid ahd" style="' + fcols + '"><div>Etiqueta</div><div>Mínimo</div><div>Máximo</div><div>Paso</div><div>Valor inicial</div></div>'
+      + T.f.map((f, i) => '<div class="agrid" style="' + fcols + '">' + ai(P + 'f.' + i + '.1', f[1], false, 'Etiqueta') + ai(P + 'f.' + i + '.2', f[2], true, 'Mínimo') + ai(P + 'f.' + i + '.3', f[3], true, 'Máximo') + ai(P + 'f.' + i + '.4', f[4], true, 'Paso') + ai(P + 'f.' + i + '.5', f[5], true, 'Valor inicial') + '</div>').join('') + '</div></div>'
+      + (badF ? '<div class="err" role="alert">Revisa las medidas: el mínimo debe ser menor que el máximo y el paso mayor que cero.</div>' : '')
+      + (T.o.length ? '<h2 class="h3" style="margin-top:6px">Opciones</h2>' + T.o.map((o, i) => '<div class="agrid" style="grid-template-columns:1.4fr repeat(' + o[2].length + ',1fr)">' + ai(P + 'o.' + i + '.1', o[1], false, 'Nombre del grupo') + o[2].map((v, j) => ai(P + 'o.' + i + '.2.' + j + '.1', v[1], false, 'Opción')).join('') + '</div>').join('') + '<div class="sm">Puedes cambiar los nombres. Los valores que usa la fórmula no cambian.</div>' : '') + '</section>';
+    const lrow = (x) => '<div style="display:grid;grid-template-columns:minmax(110px,1fr) 3fr;gap:12px;padding:10px 0;border-bottom:1px solid var(--bg);font-size:14px;line-height:1.45"><div style="font-weight:600">' + x[0] + '</div><div style="color:#5A6379">' + x[1] + '</div></div>';
+    const common = ['Desperdicio y redondeo', 'a cada cantidad se le suma el % de desperdicio y se redondea hacia arriba a piezas, bultos o kilos completos; arena y grava, de medio en medio m³.'];
+    const bases = '<section class="panel col g12"><div class="col g4"><h2 class="h3">Bases del cálculo</h2><div class="sm">Así se obtiene cada material de esta categoría. Los valores de abajo son editables y la app recalcula al instante.</div></div>'
+      + (B ? '<div class="col">' + B.lines(CFG.par).concat([common]).map(lrow).join('') + '</div>'
+        + '<div class="sb" style="margin-top:6px"><div class="ahd">Valores que usa esta fórmula</div><button type="button" class="sbtn" data-a="parReset">Restaurar valores de fábrica</button></div>'
+        + '<div class="agrid" style="grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));align-items:end">' + B.pars.map((x) => fl(PAR0[x][0] + ' · ' + PAR0[x][2] + (parShared(x) ? ' ●' : ''), ai('CFG.par.' + x, CFG.par[x], true, '', true))).join('') + '</div>'
+        + '<div class="sm">● Valor compartido: al cambiarlo también cambia en las demás categorías que lo usan. Solo se aceptan valores mayores que cero.</div>'
+        : '<div class="col">' + [['Cada material', 'cantidad = rendimiento × medida. La medida puede ser el área (m²), los metros lineales o una cantidad fija por cálculo.'], common].map(lrow).join('') + '</div><div class="sm">Los rendimientos se editan abajo, en “Materiales del cálculo”.</div>') + '</section>';
+    const fams = baseFams(k);
+    const ecols = 'grid-template-columns:2.2fr .9fr 1.4fr 1.5fr 44px';
+    const matSec = '<section class="panel col g12"><h2 class="h3">Materiales del cálculo</h2>'
+      + (fams.length ? '<div class="ahd">De la fórmula base · apaga los que no quieras incluir</div><div class="col">' + fams.map((f) => '<div class="rowl" style="min-height:48px;font-size:15px"><span>' + esc(FAMN[f] || (CAT[f] ? CAT[f].n : f)) + '</span><button type="button" class="sw" role="switch" aria-checked="' + !T.off[f] + '" aria-label="Incluir ' + esc(FAMN[f] || f) + '" data-a="baseOff" data-arg="' + f + '"></button></div>').join('') + '</div>' : '')
+      + '<div class="sb" style="margin-top:6px"><div class="ahd">Agregados por ti · cantidad = rendimiento × medida</div><button type="button" class="sbtn cy" data-a="exAdd">Agregar material</button></div>'
+      + (T.extra.length ? '<div class="tb"><div style="min-width:680px" class="col g8"><div class="agrid ahd" style="' + ecols + '"><div>Material</div><div>Rendimiento</div><div>Medida</div><div>Para qué</div><div></div></div>'
+        + T.extra.map((e, i) => '<div class="agrid" style="' + ecols + '">' + asel(P + 'extra.' + i + '.mat', e.mat, mats, 'Material') + ai(P + 'extra.' + i + '.rate', e.rate, true, 'Rendimiento') + asel(P + 'extra.' + i + '.per', e.per, PERS, 'Medida') + ai(P + 'extra.' + i + '.use', e.use, false, 'Para qué') + '<button type="button" class="ib" style="width:44px;height:44px" data-a="exDel" data-arg="' + i + '" aria-label="Quitar material">×</button></div>').join('') + '</div></div>'
+        + '<div class="sm">Con las medidas iniciales esta categoría tiene ' + fmt(r.M.area) + ' m² y ' + fmt(r.M.largo) + ' m lineales' + (T.f.some((f) => f[0] === 'A') ? ' (perímetro)' : '') + '. Ejemplo: 0.25 cubetas por m². El desperdicio se suma solo, salvo en los fijos.</div>' : '<div class="sm">Aún no agregas materiales propios a esta categoría.</div>') + '</section>';
+    const prev = '<section class="panel col g8" style="background:var(--navy);color:#fff"><div class="sb"><div class="col g2"><div style="font-size:14px;color:#C9D1E0">Ejemplo con las medidas iniciales · ' + esc(r.dims) + ' · desperdicio ' + T.w + '%</div><div class="big">' + money(r.total) + '</div></div><button type="button" class="sbtn cy" data-a="admTry">Probar en la app</button></div>'
+      + '<div style="font-size:14px;line-height:1.6;color:#C9D1E0">' + (r.rows.length ? r.rows.map((x) => esc(x.n) + ': ' + qU(x.qty, x.u)).join(' · ') : 'Todavía no hay materiales en este cálculo.') + '</div></section>';
+    const del = custom ? '<button type="button" class="sbtn" style="align-self:flex-start;background:var(--red)" data-a="catDel">Eliminar categoría</button>' : '<div class="sm">Las categorías de fábrica no se eliminan, pero puedes ocultarlas de la app.</div>';
+    body = '<div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">' + list + '<div class="col" style="flex:999 1 560px;min-width:0;gap:20px" data-k="ed-' + k + '">' + prev + gen + med + bases + matSec + del + '</div></div>';
+  } else if (a.tab === 'mat') {
+    const cols = 'grid-template-columns:2.4fr 1.2fr 1fr 1fr 1fr 44px';
+    body = '<section class="panel col g12"><div class="sb"><div class="col g4"><h2 class="h3">Catálogo de materiales</h2><div class="sm">El precio al cliente es el costo preferente más tu margen de ' + CFG.margen + '%.</div></div><button type="button" class="sbtn cy" data-a="matNew">Nuevo material</button></div>'
+      + '<div class="tb"><div style="min-width:820px" class="col g8"><div class="agrid ahd" style="' + cols + '"><div>Nombre</div><div>Nombre corto (envíos)</div><div>Unidad</div><div>Costo preferente</div><div style="text-align:right">Precio al cliente</div><div></div></div>'
+      + Object.keys(CAT).map((m) => { const c = CAT[m], can = !CAT0[m] && !matUsed(m); return '<div class="agrid" style="' + cols + '">' + ai('CAT.' + m + '.n', c.n, false, 'Nombre') + ai('CAT.' + m + '.s', c.s, false, 'Nombre corto') + asel('CAT.' + m + '.u', c.u, UNITS.map((u) => [u, u]), 'Unidad') + ai('CAT.' + m + '.c', c.c, true, 'Costo preferente') + '<div style="text-align:right;font-weight:700">' + money(price(m)) + '</div><button type="button" class="ib" style="width:44px;height:44px" data-a="matDel" data-arg="' + m + '" aria-label="Eliminar material"' + (can ? '' : ' disabled') + '>×</button></div>'; }).join('')
+      + '</div></div><div class="sm">Solo se pueden eliminar los materiales creados por ti que no estén en ninguna categoría.</div></section>';
+  } else if (a.tab === 'par') {
+    body = '<section class="panel col g12"><div class="sb"><div class="col g4"><h2 class="h3">Todas las bases del cálculo</h2><div class="sm">Los mismos valores que ves dentro de cada categoría, juntos en un solo lugar. Solo se aceptan valores mayores que cero.</div></div><button type="button" class="sbtn" data-a="parResetAll">Restaurar todo de fábrica</button></div>'
+      + '<div class="agrid" style="grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));align-items:end">' + Object.keys(PAR0).map((x) => fl(PAR0[x][0] + ' · ' + PAR0[x][2] + (CFG.par[x] !== PAR0[x][1] ? ' · de fábrica ' + PAR0[x][1] : ''), ai('CFG.par.' + x, CFG.par[x], true, '', true))).join('') + '</div></section>';
+  } else {
+    body = '<section class="panel col g14" style="max-width:760px"><h2 class="h3">Ajustes generales</h2><div class="agrid" style="grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));align-items:start">' + fl('Margen sobre costo preferente (%)', ai('CFG.margen', CFG.margen, true)) + fl('Tasa mensual del crédito (%)', ai('CFG.tasa', CFG.tasa, true)) + fl('Línea de crédito por cliente ($)', ai('CFG.linea', CFG.linea, true)) + '</div>'
+      + '<div class="sm">Estos valores se usan en toda la app: precios, simulador de pagos y línea disponible.</div>'
+      + '<button type="button" class="sbtn" style="align-self:flex-start" data-a="cfgReset">Restaurar toda la configuración de fábrica</button></section>';
+  }
+  const tabs = [['cat', 'Categorías'], ['mat', 'Materiales'], ['par', 'Bases del cálculo'], ['cfg', 'Ajustes']];
+  return '<div class="wide" data-k="admin"><div class="in"><header class="top"><div class="lg"><div class="lgi">' + LOGO(24) + '</div>BIIN<span style="font-size:14px;font-weight:400;letter-spacing:0;color:#5A6379;margin-left:6px">Super administrador</span></div><div class="tabs" role="tablist" aria-label="Secciones">' + tabs.map((t) => '<button type="button" role="tab" aria-selected="' + (a.tab === t[0]) + '" data-a="admTab" data-arg="' + t[0] + '">' + t[1] + '</button>').join('') + '</div></header>'
+    + '<div class="status">' + (sb ? 'Los cambios se guardan en Supabase y aplican para todos los usuarios la próxima vez que abran la app.' : 'Los cambios se aplican al instante en la app y se guardan en este navegador. Al conectar Supabase se guardarán en la base de datos y solo entrará quien tenga rol de super administrador.') + '</div>'
+    + '<div class="col" style="gap:20px" data-k="adm-' + a.tab + '">' + body + '</div></div></div>';
+}
+
+/* ============ armado ============ */
+function view() {
+  const scr = { boot: vBoot, acceso: vAcceso, inicio: vInicio, sim: vSim, load: vLoad, res: vRes, proy: vProy, fin: vFin, err: vErr, cred: vCred, cuenta: vCuenta }[S.screen]();
+  const note = S.note ? '<button type="button" class="note" data-a="noteTap"><span class="ic">' + LOGO(22) + '</span><span><b>' + S.note.app + ' · ahora</b><span>' + esc(S.note.text) + '</span></span></button>' : '';
+  const toast = S.toast ? '<div class="toast' + (S.view === 'phone' ? '' : ' fx') + '" data-k="toast" role="status">' + esc(S.toast) + '</div>' : '';
+  const seg = [['phone', 'App'], ['desk', 'Escritorio'], ['ops', 'Operación'], ['admin', 'Admin']].filter((x) => canView(x[0]));
+  const bar = '<div class="bar"><div class="logo">' + LOGO(26) + '<span>BIIN</span></div><div class="tag">' + connTag() + '</div><div class="seg" role="group" aria-label="Vista">' + seg.map((s) => '<button type="button" data-a="view" data-arg="' + s[0] + '" aria-pressed="' + (S.view === s[0]) + '">' + s[1] + '</button>').join('') + '</div>'
+    + '<button type="button" class="gear" data-a="menu" aria-expanded="' + S.menu + '" aria-label="Ajustes de demo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"></path><circle cx="16" cy="7" r="2"></circle><circle cx="8" cy="17" r="2"></circle></svg><span>Ajustes de demo</span></button>'
+    + (S.menu ? '<div class="menu" role="dialog" aria-label="Ajustes de demo"><h2>Ajustes de demo</h2>'
+      + '<div class="opt"><div>Sin conexión<small>Simula que el celular se quedó sin señal.</small></div><button type="button" class="sw" role="switch" aria-checked="' + S.offline + '" aria-label="Sin conexión" data-a="offline"></button></div>'
+      + '<div class="opt"><div>Respuesta automática<small>Aprueba sola a los pocos segundos si alcanza la línea. Apagada, decides tú en Operación.</small></div><button type="button" class="sw" role="switch" aria-checked="' + S.auto + '" aria-label="Respuesta automática" data-a="auto"></button></div>'
+      + (sb ? '<div class="sm">Cuenta, catálogo y obras se guardan en Supabase. Crédito, envíos e inventario siguen en modo demo y se reinician al recargar.</div></div>'
+        : '<button type="button" class="mb" data-a="reset">Reiniciar demo</button><button type="button" class="mb" data-a="resetEmpty">Empezar sin datos</button><div class="sm">Nada se guarda ni se envía: al recargar, la demo vuelve a empezar.</div></div>') : '') + '</div>';
+  let stage;
+  if (S.view === 'phone') stage = '<div class="stage ph" data-k="ph"><div class="phone">' + scr + sheetHTML() + note + toast + '</div></div>';
+  else stage = '<div class="stage" data-k="' + S.view + '">' + (S.view === 'desk' ? vDesk() : S.view === 'ops' ? vOps() : vAdmin()) + sheetHTML() + toast + '</div>';
+  return '<div id="app">' + bar + stage + '</div>';
+}
+function morph(a, b) {
+  if (a.nodeType !== b.nodeType || a.nodeName !== b.nodeName) { a.replaceWith(b); return; }
+  if (a.nodeType === 3) { if (a.data !== b.data) a.data = b.data; return; }
+  if (a.nodeType !== 1) return;
+  if (a.getAttribute('data-k') !== b.getAttribute('data-k')) { a.replaceWith(b); return; }
+  const an = a.getAttributeNames(), bn = b.getAttributeNames();
+  an.forEach((n) => { if (!b.hasAttribute(n)) a.removeAttribute(n); });
+  bn.forEach((n) => { const v = b.getAttribute(n); if (a.getAttribute(n) !== v) a.setAttribute(n, v); });
+  if (a.nodeName === 'INPUT' || a.nodeName === 'TEXTAREA') {
+    const v = a.nodeName === 'INPUT' ? (b.getAttribute('value') || '') : b.textContent;
+    if (!a.hasAttribute('data-keep') && document.activeElement !== a && a.value !== v) a.value = v;
+    return;
+  }
+  const ac = Array.from(a.childNodes), bc = Array.from(b.childNodes);
+  for (let i = 0; i < bc.length; i++) { if (i < ac.length) morph(ac[i], bc[i]); else a.appendChild(bc[i]); }
+  for (let i = bc.length; i < ac.length; i++) ac[i].remove();
+  if (a.nodeName === 'SELECT') { const v = b.getAttribute('data-v'); if (document.activeElement !== a && a.value !== v) a.value = v; }
+}
+function render() {
+  const t = document.createElement('template');
+  t.innerHTML = view();
+  morph(document.getElementById('app'), t.content.firstChild);
+}
+function fit() {
+  const h = window.innerHeight - 56 - 48;
+  document.documentElement.style.setProperty('--z', Math.max(0.5, Math.min(1, h / 844)).toFixed(3));
+}
+let toastT = 0, noteT = 0;
+function toast(m) { S.toast = m; clearTimeout(toastT); toastT = setTimeout(() => { S.toast = ''; render(); }, 3200); }
+function notify(app, text, code) { S.note = { app: app, text: text, code: code }; clearTimeout(noteT); noteT = setTimeout(() => { S.note = null; render(); }, 7000); }
+function later(ms, fn) { const g = gen; setTimeout(() => { if (g === gen) { fn(); render(); } }, ms); }
+function go(s) { S.screen = s; S.sheet = null; }
+
+/* ============ lógica de crédito ============ */
+function sendSol() {
+  const f = S.fin, m = parseFloat(f.monto);
+  const sol = { id: 's' + Date.now(), folio: 'BN-2026-00' + (S.nextSol++), cliente: f.form.nom || (S.user.email || 'Cliente +52 ' + S.user.cel), obra: f.src.obra || f.src.title, concept: f.src.concept, monto: r2(m), dias: f.dias, st: 'En revisión', fecha: addD(0), mine: true, rows: f.src.rows, dir: f.form.dir };
+  S.sols.unshift(sol);
+  f.solId = sol.id; f.step = 4; f.sending = false; S.pending = null;
+  if (S.user && f.form.nom) { S.user.nombre = f.form.nom; if (sb) sb.from('profiles').update({ nombre: f.form.nom }).eq('id', S.user.id).then(() => {}); }
+  if (S.auto) later(3800, () => { if (sol.st === 'En revisión') decide(sol, sol.monto <= disponible() + 0.005); });
+  return sol;
+}
+function decide(sol, ok) {
+  sol.st = ok ? 'Aprobada' : 'Rechazada';
+  if (!sol.mine) return;
+  if (!ok) { sol.why = sol.monto > disponible() + 0.005 ? 'El monto pasa de tu línea disponible (' + money(disponible()) + '). Intenta con un monto menor.' : ''; notify('BIIN', 'Tu solicitud ' + sol.folio + ' no fue aprobada. Abre la app para ver opciones.'); return; }
+  S.creds.push(mkCred(sol.folio, sol.concept, sol.obra, sol.monto, sol.dias));
+  S.hist.unshift({ t: 'Crédito para ' + sol.concept, sub: dShort(T0) + ' · ' + sol.obra, amt: sol.monto });
+  const rows = sol.rows || [];
+  rows.forEach((r) => { const i = S.inv.find((x) => x.key === r.key); if (i) i.apart = r2(i.apart + r.qty); });
+  const names = [];
+  rows.forEach((r) => { const s = CAT[r.key].s; if (names.indexOf(s) < 0) names.push(s); });
+  const lst = (a) => cap(a.length > 1 ? a.slice(0, -1).join(', ') + ' y ' + a[a.length - 1] : a[0] || 'material');
+  const half = names.length > 2 ? Math.ceil(names.length / 2) : names.length;
+  const parts = [names.slice(0, half)].concat(half < names.length ? [names.slice(half)] : []);
+  parts.map((p, i) => [p, i]).reverse().forEach(([p, i]) => S.envios.unshift({ id: 'EN-' + (S.nextEnv++), obra: sol.obra, mat: lst(p), prov: 'Proveedor ' + 'AB'[i], date: addD(i ? 3 : 1), win: i ? '' : '8 a 12 h', st: 'Programado', mine: true }));
+  notify('BIIN', 'Tu crédito ' + sol.folio + ' fue aprobado. Ya estamos programando tu material.');
+}
+/* ---- cuenta y obras en Supabase ---- */
+const newAuth = (after) => ({ step: 1, cel: '', cod: '', sent: '', err: '', after: after || null, mode: 'in', email: '', pass: '', info: '', busy: false });
+const canView = (v) => !sb || v === 'phone' || v === 'desk' || !!(S.user && (S.user.rol === 'super_admin' || (v === 'ops' && S.user.rol === 'operacion')));
+const connTag = () => (conn === 'on' ? 'Conectado a Supabase · crédito en demo' : conn === 'error' ? 'Sin conexión a Supabase · modo demo' : 'Demo · datos de ejemplo');
+const authMsg = (m) => (/invalid login/i.test(m) ? 'Correo o contraseña incorrectos.' : /not confirmed/i.test(m) ? 'Confirma tu correo antes de entrar: revisa tu bandeja.' : /already registered/i.test(m) ? 'Ese correo ya tiene cuenta. Entra con tu contraseña.' : /rate limit/i.test(m) ? 'Demasiados intentos. Espera unos minutos.' : /fetch|network/i.test(m) ? 'No hay conexión con el servidor. Intenta de nuevo.' : m);
+async function pullObras() {
+  const r = await sb.from('obras').select('id,nombre,ciudad,calculos').eq('user_id', S.user.id).order('created_at');
+  if (r.error) throw r.error;
+  S.obras = (r.data || []).map((o) => ({ id: o.id, name: o.nombre, city: o.ciudad || '', calcs: (o.calculos || []).filter((c) => TYPES[c.type]) }));
+}
+function pushObra(o) {
+  if (!sb || !S.user) return;
+  sb.from('obras').upsert({ id: o.id, user_id: S.user.id, nombre: o.name, ciudad: o.city, calculos: o.calcs })
+    .then((r) => { if (r.error) { toast('No se pudo guardar en Supabase: ' + r.error.message); render(); } });
+}
+async function onLogin(user) {
+  let p = null;
+  const r = await sb.from('profiles').select('nombre,rol').eq('id', user.id).maybeSingle();
+  if (r.error) toast('No se pudo leer tu perfil: ' + r.error.message); else p = r.data;
+  S.user = { id: user.id, email: user.email, cel: '', nombre: (p && p.nombre) || '', rol: (p && p.rol) || 'cliente' };
+  try { await pullObras(); } catch (e) { toast('No se pudieron leer tus obras: ' + e.message); }
+}
+async function boot() {
+  try { await DB.pull(); } catch (e) { toast('No se pudo leer el catálogo: ' + (e.message || 'sin conexión')); }
+  S.calc = { type: ORDER[0], p: defaults(ORDER[0]) };
+  if (!TYPES[S.adm.sel]) S.adm.sel = ORDER[0];
+  S.screen = 'acceso';
+  try { const r = await sb.auth.getSession(); if (r.data && r.data.session) { await onLogin(r.data.session.user); S.screen = 'inicio'; } } catch (e) { /* se queda en acceso */ }
+  render();
+}
+function startFin(src) {
+  let s;
+  if (src === 'calc') { const r = cur(), o = S.editing && S.obras.find((x) => x.id === S.editing.o); s = { title: r.title, de: 'tu ' + r.T.t.toLowerCase(), concept: r.T.t.toLowerCase(), obra: o ? o.name : '', rows: r.rows, total: r.total }; }
+  else { const o = S.obras.find((x) => x.id === src); s = { title: o.name, de: 'tu obra ' + o.name, concept: 'obra completa', obra: o.name, rows: obraRows(o), total: obraTotal(o) }; }
+  S.fin = { step: 1, monto: s.total.toFixed(2), dias: 90, docs: {}, form: { nom: (S.user && S.user.nombre) || '', curp: '', dir: '', ref: '' }, err: {}, src: s, sending: false, solId: null, from: src === 'calc' ? 'res' : 'proy' };
+  if (S.view !== 'phone') S.view = 'phone';
+  if (!S.user) { S.auth = newAuth('fin'); go('acceso'); } else go('fin');
+}
+
+/* ============ acciones ============ */
+const A = {
+  view(v) { if (!canView(v)) return; S.view = v; S.menu = false; S.sheet = null; },
+  menu() { S.menu = !S.menu; },
+  offline() {
+    S.offline = !S.offline;
+    if (!S.offline && S.pending) { S.fin = S.pending; const sol = sendSol(); toast('Volvió la señal: enviamos tu solicitud ' + sol.folio + '.'); }
+    else toast(S.offline ? 'Modo sin conexión activado.' : 'De vuelta en línea.');
+  },
+  auto() { S.auto = !S.auto; },
+  reset() { seed(false); },
+  resetEmpty() { seed(true); },
+  go(s) { if (s === 'sim') { S.msg = ''; } go(s); },
+  tab(k) {
+    if (k === 'cred' && !S.user) { S.auth = newAuth('cred'); go('acceso'); }
+    else if (k === 'cuenta' && !S.user) { S.auth = newAuth('cuenta'); go('acceso'); }
+    else go(k);
+  },
+  deskTab(k) { if (k !== 'inicio') { S.view = 'phone'; A.tab(k); } },
+  goCred() { go('cred'); },
+  guest() { go('inicio'); },
+  authMode() { const a = S.auth; a.mode = a.mode === 'in' ? 'up' : 'in'; a.err = ''; a.info = ''; },
+  authGo() {
+    const a = S.auth, email = a.email.trim();
+    if (a.busy) return;
+    a.err = ''; a.info = '';
+    if (!/^\S+@\S+\.\S+$/.test(email)) { a.err = 'Escribe un correo válido.'; return; }
+    if (a.pass.length < 6) { a.err = 'La contraseña debe tener al menos 6 caracteres.'; return; }
+    a.busy = true;
+    (a.mode === 'up' ? sb.auth.signUp({ email: email, password: a.pass }) : sb.auth.signInWithPassword({ email: email, password: a.pass })).then(async (r) => {
+      if (r.error) { a.busy = false; a.err = authMsg(r.error.message); }
+      else if (!r.data.session) { a.busy = false; a.mode = 'in'; a.info = 'Te enviamos un correo para confirmar tu cuenta. Ábrelo y después entra aquí.'; }
+      else { await onLogin(r.data.user); const af = a.after; S.auth = newAuth(); go(af && (af !== 'fin' || S.fin) ? af : 'inicio'); toast('Listo, ya entraste.'); }
+      render();
+    }).catch(() => { a.busy = false; a.err = 'No hay conexión con el servidor. Intenta de nuevo.'; render(); });
+  },
+  authSend() {
+    const a = S.auth, c = a.cel.replace(/\D/g, '');
+    if (c.length !== 10) { a.err = 'Escribe los 10 dígitos de tu celular, sin espacios.'; return; }
+    a.cel = c.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3'); a.err = ''; a.step = 2; a.cod = '';
+    a.sent = String(Math.floor(100000 + Math.random() * 900000));
+    notify('Mensajes', 'BIIN: tu código es ' + a.sent + '. No lo compartas.', a.sent);
+  },
+  authBack() { S.auth.step = 1; S.auth.err = ''; S.note = null; },
+  authOk() {
+    const a = S.auth;
+    if (a.cod.trim() !== a.sent) { a.err = a.cod.trim().length < 6 ? 'Escribe los 6 números del código.' : 'Ese código no coincide. Revisa el mensaje.'; return; }
+    S.user = { cel: a.cel, nombre: '' }; S.note = null;
+    go(a.after && (a.after !== 'fin' || S.fin) ? a.after : 'inicio');
+    toast('Listo, ya entraste.');
+  },
+  noteTap() { if (S.note && S.note.code && S.screen === 'acceso') { S.auth.cod = S.note.code; S.auth.err = ''; const el = document.getElementById('cod'); if (el) el.value = S.note.code; } S.note = null; },
+  logout() { if (sb) { sb.auth.signOut(); S.obras = []; S.view = 'phone'; } S.user = null; S.auth = newAuth(null); go('acceso'); },
+  installAsk() { S.sheet = { k: 'install' }; },
+  installNo() { S.install = false; S.sheet = null; },
+  installOk() { S.install = false; S.sheet = null; toast('En esta demo la instalación es simulada.'); },
+  pick(k) { S.calc = { type: k, p: defaults(k) }; S.editing = null; S.saved = false; S.msg = ''; go('sim'); },
+  pickDesk(k) { S.calc = { type: k, p: defaults(k) }; S.editing = null; S.saved = false; S.msg = ''; },
+  step(arg) { const a = arg.split(','), f = TYPES[S.calc.type].f.find((x) => x[0] === a[0]); S.calc.p[a[0]] = r2(Math.min(f[3], Math.max(f[2], S.calc.p[a[0]] + (Math.abs(f[4]) || 1) * a[1]))); S.saved = false; },
+  opt(arg) { const a = arg.split(','); S.calc.p[a[0]] = a[1]; S.saved = false; },
+  verRes() { S.msg = ''; go('load'); later(750, () => { if (S.screen === 'load') go('res'); }); },
+  openCalc(arg) { const a = arg.split(','), o = S.obras.find((x) => x.id === a[0]), c = o.calcs.find((x) => x.id === a[1]); S.calc = { type: c.type, p: Object.assign({}, c.p) }; S.editing = { o: o.id, c: c.id }; S.saved = false; S.msg = 'Guardado en “' + o.name + '” como ' + c.label + '.'; go('res'); },
+  save() {
+    if (S.saved) return;
+    if (sb && !S.user) { S.view = 'phone'; S.auth = newAuth('res'); go('acceso'); toast('Entra con tu cuenta para guardar tus obras.'); return; }
+    if (S.editing) { const o = S.obras.find((x) => x.id === S.editing.o), c = o && o.calcs.find((x) => x.id === S.editing.c); if (c) { c.p = Object.assign({}, S.calc.p); S.saved = true; S.msg = 'Actualizado en “' + o.name + '”.'; pushObra(o); return; } }
+    const r = cur();
+    S.sheet = { k: 'save', label: r.T.t + ' de ' + r.dims, obra: S.obras.length ? S.obras[0].id : 'new', name: '', err: false };
+  },
+  saveObra(id) { S.sheet.obra = id; S.sheet.err = false; },
+  saveOk() {
+    const s = S.sheet; let o;
+    if (s.obra === 'new') { if (!s.name.trim()) { s.err = true; return; } o = { id: uuid(), name: s.name.trim(), city: 'Hermosillo, Son.', calcs: [] }; S.obras.push(o); }
+    else o = S.obras.find((x) => x.id === s.obra);
+    const c = { id: 'c' + Date.now(), type: S.calc.type, label: s.label.trim() || TYPES[S.calc.type].t, p: Object.assign({}, S.calc.p) };
+    o.calcs.push(c); S.editing = { o: o.id, c: c.id }; S.saved = true; S.sheet = null; S.msg = 'Guardado en la obra “' + o.name + '”.'; pushObra(o);
+  },
+  doc(arg) { const a = arg.split(','); S.sheet = { k: 'doc', mode: a[0], src: a[1], done: false, manual: false }; },
+  copy() {
+    const s = S.sheet, txt = docText(docData(s.src), s.mode === 'xls');
+    const ok = () => { s.done = true; render(); }, ko = () => { s.manual = true; render(); };
+    try { navigator.clipboard.writeText(txt).then(ok, ko); } catch (e) { ko(); }
+  },
+  close() { S.sheet = null; },
+  veil(arg, el, ev) { if (ev.target === el) S.sheet = null; },
+  fin(src) { startFin(src); },
+  plazo(d) { S.fin.dias = +d; },
+  autofill() { Object.assign(S.fin.form, { nom: 'Carlos Mendoza Ruiz', curp: 'MERC850314HSRNZR09', dir: 'Calle Olivos 214, Col. Los Olivos', ref: 'Portón negro, frente a la tienda' }); S.fin.err = {}; },
+  finNext() {
+    const f = S.fin; f.err = {};
+    if (f.step === 1) { if (!(parseFloat(f.monto) > 0)) { f.err.monto = 1; return; } f.step = 2; }
+    else if (f.step === 2) {
+      const x = f.form;
+      if (x.nom.trim().split(/\s+/).length < 2) f.err.nom = 'Escribe tu nombre y apellidos.';
+      if (!/^[A-Za-z0-9]{18}$/.test(x.curp.trim())) f.err.curp = 'La CURP lleva 18 letras y números.';
+      if (x.dir.trim().length < 5) f.err.dir = 'Dinos a dónde llevamos el material.';
+      if (Object.keys(f.err).length) return;
+      x.curp = x.curp.trim().toUpperCase(); f.step = 3;
+    } else if (f.step === 3) { if (DOCS.some((d) => f.docs[d[0]] !== 2)) { f.err.docs = 1; return; } A.finSend(); return; }
+    const m = document.getElementById('finMain'); if (m) m.scrollTop = 0;
+  },
+  finBack() { S.fin.step--; S.fin.err = {}; },
+  finExit() { const f = S.fin; if (f.step > 1 && f.step < 4) { f.step--; f.err = {}; } else go(f.step === 4 ? 'cred' : f.from); },
+  finRetry() { S.fin.step = 1; S.fin.solId = null; },
+  docFoto(k) { const f = S.fin; f.docs[k] = 1; f.err = {}; later(900, () => { if (S.fin === f) f.docs[k] = 2; }); },
+  finSend() {
+    const f = S.fin; if (f.sending) return; f.sending = true;
+    later(1300, () => { if (S.offline) { f.sending = false; go('err'); } else { sendSol(); go('fin'); } });
+  },
+  finLater() { S.pending = S.fin; go('inicio'); toast('Guardamos tu solicitud. Se envía sola cuando vuelva la señal.'); },
+  verSol(id) { const sol = S.sols.find((s) => s.id === id); if (S.fin && S.fin.solId === id) go('fin'); else { S.fin = { step: 4, monto: sol.monto.toFixed(2), dias: sol.dias, docs: {}, form: { nom: (S.user && S.user.nombre) || '', curp: '', dir: '', ref: '' }, err: {}, src: { title: sol.obra, de: 'tu material', concept: sol.concept, obra: sol.obra, rows: sol.rows || [], total: sol.monto }, sending: false, solId: id, from: 'cred' }; go('fin'); } },
+  pay() { S.sheet = { k: 'pay', mode: 'spei' }; },
+  payMode(m) { S.sheet.mode = m; },
+  payOk() { const x = pendientes()[0]; x.p.paid = true; S.hist.unshift({ t: 'Pago recibido', sub: dShort(T0) + ' · ' + x.c.folio, amt: x.p.amt }); S.sheet = null; toast('Pago registrado. Tu línea disponible subió a ' + money(disponible()) + '.'); },
+  admTab(t) { S.adm.tab = t; },
+  admSel(k) { S.adm.sel = k; },
+  admTry() { const k = S.adm.sel; if (!TYPES[k].on) { toast('Esta categoría está oculta: actívala para verla en la app.'); return; } S.view = 'phone'; A.pick(k); },
+  catNew() {
+    const k = 'c' + Date.now();
+    TYPES[k] = { t: 'Nueva categoría', d: 'Descripción corta', f: [['L', 'Largo (m)', 1, 50, 0.5, 5], ['A', 'Ancho (m)', 1, 50, 0.5, 4]], o: [], w: 5, note: 'No incluye mano de obra.', base: 'custom', shape: 'plan', icon: 'firme', on: true, h: 'Pon las medidas y listo', off: {}, extra: [] };
+    ORDER.push(k); S.adm.sel = k;
+  },
+  catShape(sh) {
+    const T = TYPES[S.adm.sel]; T.shape = sh;
+    T.f = sh === 'lineal' ? [['L', 'Metros en total', 1, 200, 1, 20]] : sh === 'muro' ? [['L', 'Largo (m)', 1, 60, 0.5, 5], ['H', 'Alto (m)', 0.5, 6, 0.5, 2.5]] : [['L', 'Largo (m)', 1, 50, 0.5, 5], ['A', 'Ancho (m)', 1, 50, 0.5, 4]];
+    T.extra.forEach((e) => { if (sh === 'lineal' && e.per === 'area') e.per = 'largo'; });
+    if (S.calc.type === S.adm.sel) S.calc.p = defaults(S.adm.sel);
+    S.obras.forEach((o) => o.calcs.forEach((c) => { if (c.type === S.adm.sel) c.p = defaults(c.type); }));
+  },
+  catDel() {
+    const k = S.adm.sel; if (TYPES[k].base !== 'custom') return;
+    delete TYPES[k]; ORDER.splice(ORDER.indexOf(k), 1);
+    S.obras.forEach((o) => { o.calcs = o.calcs.filter((c) => c.type !== k); });
+    if (S.calc.type === k) { S.calc = { type: ORDER[0], p: defaults(ORDER[0]) }; S.editing = null; if (S.screen === 'sim' || S.screen === 'res' || S.screen === 'load') S.screen = 'inicio'; }
+    S.adm.sel = ORDER[0]; toast('Categoría eliminada.');
+  },
+  catMove(arg) { const a = arg.split(','), i = ORDER.indexOf(a[0]), j = i + (+a[1]); if (j < 0 || j >= ORDER.length) return; ORDER.splice(i, 1); ORDER.splice(j, 0, a[0]); },
+  catOn() { const T = TYPES[S.adm.sel]; T.on = !T.on; },
+  catIcon(ic) { TYPES[S.adm.sel].icon = ic; },
+  baseOff(f) { const T = TYPES[S.adm.sel]; if (T.off[f]) delete T.off[f]; else T.off[f] = 1; },
+  exAdd() { TYPES[S.adm.sel].extra.push({ mat: Object.keys(CAT)[0], rate: 1, per: TYPES[S.adm.sel].shape === 'lineal' ? 'largo' : 'area', use: 'Adicional' }); },
+  exDel(i) { TYPES[S.adm.sel].extra.splice(+i, 1); },
+  parReset() { BASES[TYPES[S.adm.sel].base].pars.forEach((x) => { CFG.par[x] = PAR0[x][1]; }); toast('Bases de esta categoría restauradas.'); },
+  parResetAll() { CFG.par = parDefaults(); toast('Todas las bases restauradas.'); },
+  matNew() { CAT['m' + Date.now()] = { n: 'Nuevo material', s: 'material', u: 'pz', c: 100 }; toast('Material agregado al final del catálogo.'); },
+  matDel(k) { if (CAT0[k] || matUsed(k)) return; delete CAT[k]; },
+  cfgReset() { factory(); DB.clear(); S.adm.sel = ORDER[0]; S.calc = { type: ORDER[0], p: defaults(ORDER[0]) }; S.editing = null; S.obras.forEach((o) => { o.calcs = o.calcs.filter((c) => TYPES[c.type]); }); toast('Configuración de fábrica restaurada.'); },
+  opsTab(t) { S.ops.tab = t; },
+  solOk(id) { const s = S.sols.find((x) => x.id === id); if (s.mine && s.monto > disponible() + 0.005) { toast('No alcanza la línea del cliente (' + money(disponible()) + ' disponibles).'); return; } decide(s, true); toast('Solicitud ' + s.folio + ' aprobada.'); },
+  solNo(id) { const s = S.sols.find((x) => x.id === id); decide(s, false); toast('Solicitud ' + s.folio + ' rechazada.'); },
+  invOrder(i) { const r = S.inv[+i]; r.disp += r.aviso * 3; toast('Pedido enviado al proveedor: +' + num(r.aviso * 3) + ' ' + CAT[r.key].u + '.'); },
+  envNext(i) { const e = S.envios[+i]; e.st = { 'Programado': 'En camino', 'En camino': 'Entregado', 'Con retraso': 'En camino' }[e.st]; if (e.mine) notify('BIIN', e.st === 'Entregado' ? 'Tu material ya está en la obra: ' + e.mat.toLowerCase() + '.' : 'Tu material va en camino: ' + e.mat.toLowerCase() + '.'); }
+};
+document.addEventListener('click', (ev) => {
+  const el = ev.target.closest('[data-a]');
+  if (S.menu && !ev.target.closest('.menu') && !(el && el.dataset.a === 'menu')) { S.menu = false; if (!el) { render(); return; } }
+  if (!el || el.disabled) return;
+  const fn = A[el.dataset.a];
+  if (fn) { fn(el.dataset.arg, el, ev); if (S.view === 'admin') DB.save(); render(); }
+});
+function setPath(path, v) { const k = path.split('.'); let o = S; if (k[0] === 'TYPES') { o = TYPES; k.shift(); } else if (k[0] === 'CAT') { o = CAT; k.shift(); } else if (k[0] === 'CFG') { o = CFG; k.shift(); } for (let i = 0; i < k.length - 1; i++) o = o[k[i]]; o[k[k.length - 1]] = v; }
+document.addEventListener('input', (ev) => {
+  const el = ev.target;
+  if (el.dataset.f) { let v = el.value; if (el.dataset.t === 'num') { v = parseFloat(v); if (isNaN(v) || (el.dataset.pos && !(v > 0))) return; } setPath(el.dataset.f, v); if (S.view === 'admin') DB.save(); if (el.dataset.f === 'fin.monto' || el.dataset.r) render(); }
+  else if (el.dataset.range) { const v = parseInt(el.value, 10); if (el.dataset.range === 'margen') { CFG.margen = v; DB.save(); } else { S.calc.p.w = v; S.saved = false; } render(); }
+});
+document.addEventListener('change', (ev) => {
+  const el = ev.target, k = el.dataset.num;
+  if (el.dataset.f && el.dataset.t === 'num') { el.blur(); render(); return; } /* un valor no válido vuelve al último guardado */
+  if (!k) return;
+  const f = TYPES[S.calc.type].f.find((x) => x[0] === k), n = parseFloat(el.value);
+  S.calc.p[k] = r2(Math.min(f[3], Math.max(f[2], isNaN(n) ? f[2] : n)));
+  el.value = fmt(S.calc.p[k]); S.saved = false; render();
+});
+document.addEventListener('keydown', (ev) => {
+  if (ev.key === 'Escape' && (S.sheet || S.menu)) { S.sheet = null; S.menu = false; render(); return; }
+  if (ev.key === 'Enter' && ev.target.dataset && ev.target.dataset.enter) { A[ev.target.dataset.enter](); render(); }
+  else if (ev.key === 'Enter' && ev.target.dataset && ev.target.dataset.num) ev.target.blur();
+});
+window.addEventListener('resize', fit);
+seed(!!sb); if (sb) S.screen = 'boot'; fit(); render(); if (sb) boot();
+</script>
+</body>
+</html>

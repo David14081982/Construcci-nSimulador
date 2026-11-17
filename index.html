@@ -1095,7 +1095,7 @@ const A = {
     if (!/^\S+@\S+\.\S+$/.test(email)) { a.err = 'Escribe un correo válido.'; return; }
     if (a.pass.length < 6) { a.err = 'La contraseña debe tener al menos 6 caracteres.'; return; }
     a.busy = true;
-    (a.mode === 'up' ? sb.auth.signUp({ email: email, password: a.pass }) : sb.auth.signInWithPassword({ email: email, password: a.pass })).then(async (r) => {
+    (a.mode === 'up' ? sb.auth.signUp({ email: email, password: a.pass, options: /^http/.test(location.protocol) ? { emailRedirectTo: location.origin + location.pathname } : {} }) : sb.auth.signInWithPassword({ email: email, password: a.pass })).then(async (r) => {
       if (r.error) { a.busy = false; a.err = authMsg(r.error.message); }
       else if (!r.data.session) { a.busy = false; a.mode = 'in'; a.info = 'Te enviamos un correo para confirmar tu cuenta. Ábrelo y después entra aquí.'; }
       else { await onLogin(r.data.user); const af = a.after; S.auth = newAuth(); go(af && (af !== 'fin' || S.fin) ? af : 'inicio'); toast('Listo, ya entraste.'); }
